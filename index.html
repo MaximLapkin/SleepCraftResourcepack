@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>СКРП - База данных</title>
+    <style>
+        :root {
+            --bg-color: #0b0e14;
+            --surface-color: #161b22;
+            --table-header: #21262d;
+            --table-row: #0d1117;
+            --table-hover: #1f2937;
+            --border-color: #30363d;
+            --text-main: #c9d1d9;
+            --text-bright: #ffffff;
+            --accent: #58a6ff;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* Фон с лапками */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Логотип */
+        header {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .logo-container {
+            display: inline-block;
+            font-size: 5.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #fff 30%, #58a6ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(88, 166, 255, 0.4));
+            letter-spacing: 12px;
+            font-family: 'Verdana', sans-serif;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px 60px;
+        }
+
+        section { margin-bottom: 100px; scroll-margin-top: 50px; }
+
+        h2 {
+            font-size: 2rem;
+            color: var(--accent);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 40px;
+        }
+
+        /* Таблицы */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--table-row);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th {
+            background-color: var(--table-header);
+            color: var(--text-bright);
+            padding: 18px;
+            text-align: left;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 15px 18px;
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        tr:hover td {
+            background-color: var(--table-hover);
+            color: var(--text-bright);
+        }
+
+        .item-icon {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            image-rendering: pixelated;
+        }
+
+        /* Боковые панели на всю высоту */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            height: 100vh;
+            background: rgba(13, 17, 23, 0.95);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Центрируем контент по вертикали */
+            padding: 0 30px;
+            box-sizing: border-box;
+        }
+
+        .sidebar.left {
+            left: 0;
+            width: 250px;
+            border-left: none;
+            transform: translateX(-100%);
+        }
+
+        .sidebar.right {
+            right: 0;
+            width: 250px;
+            border-right: none;
+            transform: translateX(100%);
+        }
+
+        .sidebar:hover { transform: translateX(0); }
+
+        /* Ярлычки вкладок */
+        .tab {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%) rotate(0deg);
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            padding: 30px 10px;
+            cursor: pointer;
+            color: var(--accent);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            writing-mode: vertical-rl;
+            font-size: 0.9rem;
+        }
+
+        .left .tab { right: -42px; border-left: none; border-radius: 0 10px 10px 0; transform: translateY(-50%) rotate(0deg); }
+        .right .tab { left: -42px; border-right: none; border-radius: 10px 0 0 10px; }
+
+        /* Контент внутри панелей */
+        .sidebar h3 {
+            color: var(--text-bright);
+            border-bottom: 1px solid var(--accent);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar ul { list-style: none; padding: 0; }
+        .sidebar li { margin: 20px 0; }
+        .sidebar a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: 0.3s;
+        }
+        .sidebar a:hover { color: var(--accent); padding-left: 10px; }
+
+    </style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<div class="sidebar left">
+    <div class="tab">Содержание</div>
+    <h3>Навигация</h3>
+    <ul>
+        <li><a href="#swords">⚔️ Мечи</a></li>
+        <li><a href="#crossbow">🏹 Арбалеты</a></li>
+		<li><a href="#arrows">🏹 Стрелы</a></li>
+		<li><a href="#decor">🖼️ Декор</a></li>
+		<li><a href="#other">📌 Прочее</a></li>
+    </ul>
+</div>
+
+<div class="sidebar right">
+    <div class="tab">Ссылки</div>
+    <h3>Ресурсы</h3>
+    <ul>
+        <li><a href="#">🌐 Сайт СКРП</a></li>
+        <li><a href="#">📜 Правила</a></li>
+        <li><a href="#">💬 Дискорд</a></li>
+        <li><a href="#">💎 Донат</a></li>
+    </ul>
+</div>
+
+<header>
+    <div class="logo-container">СКРП</div>
+</header>
+
+<main>
+    <section id="swords">
+        <h2>Мечи</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th width="80">Иконка</th>
+                    <th>Переименование</th>
+                    <th>Предмет</th>
+                    <th>Особенность</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><img src="pink_sword.png" alt="" class="item-icon" onerror="this.src='https://via.placeholder.com/36/ff00ff?text=S'"></td>
+                    <td>Дубинка</td>
+                    <td>Деревянный меч</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="crossbow">
+        <h2>Арбалеты</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th width="80">Иконка</th>
+                    <th>Переименование</th>
+                    <th>Предмет</th>
+                    <th>Особенность</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><img src="titan_axe.png" alt="" class="item-icon" onerror="this.src='https://via.placeholder.com/36/555?text=A'"></td>
+                    <td>Руджо</td>
+                    <td>Арбалет</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><img src="curved_axe.png" alt="" class="item-icon" onerror="this.src='https://via.placeholder.com/36/840?text=A'"></td>
+                    <td>Обрез</td>
+                    <td>Арбалет</td>
+                    <td></td>
+                </tr>
+				<tr>
+                    <td><img src="curved_axe.png" alt="" class="item-icon" onerror="this.src='https://via.placeholder.com/36/840?text=A'"></td>
+                    <td>Пистолет</td>
+                    <td>Арбалет</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+	
+	    <section id="arrows">
+        <h2>Стрелы</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th width="80">Иконка</th>
+                    <th>Переименование</th>
+                    <th>Предмет</th>
+                    <th>Особенность</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><img src="pink_sword.png" alt="" class="item-icon" onerror="this.src='https://via.placeholder.com/36/ff00ff?text=S'"></td>
+                    <td>7.62мм</td>
+                    <td>Стрела</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><img src="green_sword.png" alt="" class="item-icon" onerror="this.src='https://via.placeholder.com/36/00ff00?text=S'"></td>
+                    <td>Картечь</td>
+                    <td>Стрела</td>
+                    <td></td>
+                </tr>
+				<tr>
+                    <td><img src="green_sword.png" alt="" class="item-icon" onerror="this.src='https://via.placeholder.com/36/00ff00?text=S'"></td>
+                    <td>357 Магнум</td>
+                    <td>Стрела</td>
+                    <td></td>
+                </tr>
+				<tr>
+                    <td><img src="green_sword.png" alt="" class="item-icon" onerror="this.src='https://via.placeholder.com/36/00ff00?text=S'"></td>
+                    <td>Медный 357 Магнум</td>
+                    <td>Стрела</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+	
+	<section id="decor">
+        <h2>Декор</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th width="80">Иконка</th>
+                    <th>Переименование</th>
+                    <th>Предмет</th>
+                    <th>Особенность</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><img src="pink_sword.png" alt="" class="item-icon" onerror="this.src='https://via.placeholder.com/36/ff00ff?text=S'"></td>
+                    <td>Канделябр с 3 свечами</td>
+                    <td>Кусочек железа</td>
+                    <td></td>
+                </tr>
+				<tr>
+                    <td><img src="pink_sword.png" alt="" class="item-icon" onerror="this.src='https://via.placeholder.com/36/ff00ff?text=S'"></td>
+                    <td>Maxim_Lapkin</td>
+                    <td>Кусочек железа</td>
+                    <td></td>
+                </tr>
+				<tr>
+                    <td><img src="pink_sword.png" alt="" class="item-icon" onerror="this.src='https://via.placeholder.com/36/ff00ff?text=S'"></td>
+                    <td>Пуля</td>
+                    <td>Кусочек железа</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+	
+	<section id="other">
+        <h2>Прочее</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th width="80">Иконка</th>
+                    <th>Переименование</th>
+                    <th>Предмет</th>
+                    <th>Особенность</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><img src="pink_sword.png" alt="" class="item-icon" onerror="this.src='https://via.placeholder.com/36/ff00ff?text=S'"></td>
+                    <td>Наручники</td>
+                    <td>Поводок</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
