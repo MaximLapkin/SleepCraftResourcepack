@@ -63,6 +63,563 @@
             margin-bottom: 40px;
         }
 
+        /* --- БЛОК ОБНОВЛЕНИЙ И ТЕКСТ --- */
+        .about-text {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .updates-block {
+            border-left: 4px solid var(--accent);
+            background-color: var(--surface-color);
+            padding: 20px 30px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 60px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .updates-block h3 { margin-top: 0; color: var(--text-bright); }
+        
+        .updates-list { list-style: none; padding: 0; margin: 0; }
+        .updates-list li { margin: 10px 0; }
+        .updates-list li::before { content: "- "; color: var(--accent); font-weight: bold; }
+
+        /* --- ТАБЛИЦЫ --- */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto; 
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--table-row);
+            min-width: 600px; 
+        }
+
+        th {
+            background-color: var(--table-header);
+            color: var(--text-bright);
+            padding: 18px;
+            text-align: left;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 15px 18px;
+            border-bottom: 1px solid var(--border-color);
+            transition: 0.3s;
+        }
+
+        tr:hover td { background-color: var(--table-hover); color: var(--text-bright); }
+
+        .item-icon { width: 100px; height: 100px; object-fit: contain; image-rendering: pixelated; }
+
+        /* --- БОКОВЫЕ ПАНЕЛИ --- */
+        .sidebar {
+            position: fixed;
+            top: 0; height: 100vh;
+            background: rgba(13, 17, 23, 0.95);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 0 30px; box-sizing: border-box;
+        }
+
+        .sidebar.left { left: 0; width: 250px; border-left: none; transform: translateX(-100%); }
+        .sidebar.right { right: 0; width: 250px; border-right: none; transform: translateX(100%); }
+        .sidebar:hover { transform: translateX(0); }
+
+        .tab {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            padding: 30px 10px; cursor: pointer;
+            color: var(--accent); font-weight: bold; text-transform: uppercase;
+            letter-spacing: 3px; writing-mode: vertical-rl; font-size: 0.9rem;
+        }
+
+        .left .tab { right: -42px; border-left: none; border-radius: 0 10px 10px 0; }
+        .right .tab { left: -42px; border-right: none; border-radius: 10px 0 0 10px; }
+
+        .sidebar h3 { color: var(--text-bright); border-bottom: 1px solid var(--accent); padding-bottom: 10px; margin-bottom: 20px; }
+        .sidebar ul { list-style: none; padding: 0; }
+        .sidebar li { margin: 20px 0; }
+        .sidebar a { color: var(--text-main); text-decoration: none; font-size: 1.1rem; transition: 0.3s; }
+        .sidebar a:hover { color: var(--accent); padding-left: 10px; }
+
+        /* --- КНОПКИ МУЗЫКИ --- */
+        .music-btn {
+            position: fixed;
+            top: 20px; right: 20px;
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            background-color: var(--surface-color);
+            border: 2px solid var(--accent);
+            color: var(--text-bright);
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 1100;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.3s;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .music-btn:hover { background-color: var(--table-hover); transform: scale(1.1); }
+
+        /* --- ПОЛНОЭКРАННЫЙ ОВЕРЛЕЙ И СЕКРЕТНАЯ СТРАНИЦА --- */
+        .fullscreen-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background-color: black;
+            z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden;
+        }
+        .fullscreen-overlay.hidden { display: none; }
+        
+        .fullscreen-overlay img {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover; /* GIF растянется на весь экран */
+            z-index: 1;
+            opacity: 0.7; /* Делаем немного прозрачной, чтобы текст читался лучше */
+        }
+
+        .creepy-text {
+            position: relative;
+            z-index: 2;
+            color: #ff0000;
+            font-family: serif;
+            font-size: 5vw;
+            text-align: center;
+            text-shadow: 0px 0px 15px #ff0000, 0px 0px 30px #8a0000;
+            text-transform: uppercase;
+            pointer-events: none;
+            animation: glitch 0.3s linear infinite;
+            margin: 0 20px;
+        }
+
+        /* Эффект легкого глитча (дергания) текста */
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        /* --- АДАПТАЦИЯ ПОД МОБИЛЬНЫЕ УСТРОЙСТВА --- */
+        @media screen and (max-width: 768px) {
+            main { padding: 20px 15px; }
+            .logo-container { font-size: 3rem; letter-spacing: 5px; }
+            .sidebar { width: 200px; }
+            h2 { font-size: 1.5rem; }
+            .music-btn { top: 10px; right: 10px; width: 45px; height: 45px; }
+            .creepy-text { font-size: 10vw; } /* Текст крупнее на мобилках */
+        }
+    </style>
+</head>
+<body>
+
+<audio id="bgMusic" loop src="lofi.mp3"></audio>
+<audio id="secretMusic" loop src="page.mp3"></audio>
+
+<button id="musicToggleBtn" class="music-btn">▶️</button>
+
+<div id="secretOverlay" class="fullscreen-overlay hidden">
+    <img src="page.gif" alt="Secret">
+    <h1 class="creepy-text">Ты листал слишком долго</h1>
+</div>
+
+<canvas id="bgCanvas"></canvas>
+
+<div class="sidebar left">
+    <div class="tab">Содержание</div>
+    <h3>Навигация</h3>
+    <ul>
+        <li><a href="#Accessories">🎀 Аксессуары</a></li>
+        <li><a href="#swords">⚔️ Мечи</a></li>
+        <li><a href="#crossbow">🏹 Арбалеты</a></li>
+        <li><a href="#arrows">🏹 Стрелы</a></li>
+        <li><a href="#decor">🖼️ Декор</a></li>
+        <li><a href="#other">📌 Прочее</a></li>
+    </ul>
+</div>
+
+<div class="sidebar right">
+    <div class="tab">Ссылки</div>
+    <h3>Ресурсы</h3>
+    <ul>
+        <li><a href="#">🌐 Сайт СКРП</a></li>
+        <li><a href="#">📜 Правила</a></li>
+        <li><a href="#">💬 Дискорд</a></li>
+        <li><a href="#">💎 Донат</a></li>
+    </ul>
+</div>
+
+<header>
+    <div class="logo-container">СКРП</div>
+</header>
+
+<main>
+    <div class="about-text">
+        <strong>О СКРП:</strong> Добро пожаловать в базу данных ресурспака! Здесь собрана вся информация о кастомных предметах, механиках и переименованиях.
+    </div>
+
+    <div class="updates-block">
+        <h3>Последние обновления</h3>
+        <ul class="updates-list">
+            <li>Добавлены новые механики;</li>
+            <li>Обновлены текстуры для телевизора и декора;</li>
+            <li>Исправлены баги с отображением моделей в руках.</li>
+        </ul>
+    </div>
+
+    <section id="Accessories">
+        <h2>Аксессуары</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="80">Иконка</th>
+                        <th>Переименование</th>
+                        <th>Предмет</th>
+                        <th>Особенность</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><img src="images/catears.png" alt="" class="item-icon"></td>
+                        <td>Кошачьи ушки</td>
+                        <td>Вырезанная тыква</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/foxears.png" alt="" class="item-icon"></td>
+                        <td>Лисьи ушки</td>
+                        <td>Вырезанная тыква</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/mlgglasses.png" alt="" class="item-icon"></td>
+                        <td>MLG Очки</td>
+                        <td>Вырезанная тыква</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="swords">
+        <h2>Мечи</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="80">Иконка</th>
+                        <th>Переименование</th>
+                        <th>Предмет</th>
+                        <th>Особенность</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><img src="images/baton.png" alt="" class="item-icon"></td>
+                        <td>Дубинка</td>
+                        <td>Деревянный меч</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="crossbow">
+        <h2>Арбалеты</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="80">Иконка</th>
+                        <th>Переименование</th>
+                        <th>Предмет</th>
+                        <th>Особенность</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><img src="images/rujo.png" alt="" class="item-icon"></td>
+                        <td>Руджо</td>
+                        <td>Арбалет</td>
+                        <td>В левой руке принимает положение на спине</td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/Obrez.png" alt="" class="item-icon"></td>
+                        <td>Обрез</td>
+                        <td>Арбалет</td>
+                        <td>В левой руке принимает положение на спине</td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/pistol.png" alt="" class="item-icon"></td>
+                        <td>Пистолет</td>
+                        <td>Арбалет</td>
+                        <td>В левой руке принимает положение у виска</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    
+    <section id="arrows">
+        <h2>Стрелы</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="80">Иконка</th>
+                        <th>Переименование</th>
+                        <th>Предмет</th>
+                        <th>Особенность</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><img src="images/762kal.png" alt="" class="item-icon"></td>
+                        <td>7.62мм</td>
+                        <td>Стрела</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/12kal.png" alt="" class="item-icon"></td>
+                        <td>Картечь</td>
+                        <td>Стрела</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/magnum357.png" alt="" class="item-icon"></td>
+                        <td>357 Магнум</td>
+                        <td>Стрела</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/magnum357med.png" alt="" class="item-icon"></td>
+                        <td>Медный 357 Магнум</td>
+                        <td>Стрела</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    
+    <section id="decor">
+        <h2>Декор</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="80">Иконка</th>
+                        <th>Переименование</th>
+                        <th>Предмет</th>
+                        <th>Особенность</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><img src="images/tv.png" alt="" class="item-icon"></td>
+                        <td>Телевизор</td>
+                        <td>Кусочек железа</td>
+                        <td>Анимированная текстура</td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/tvssshadek.png" alt="" class="item-icon"></td>
+                        <td>СлипТВ</td>
+                        <td>Кусочек железа</td>
+                        <td>Анимированная текстура</td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/iron_nugget.png" alt="" class="item-icon"></td>
+                        <td>Канделябр с 3 свечами</td>
+                        <td>Кусочек железа</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/maxmodel.png" alt="" class="item-icon"></td>
+                        <td>Maxim_Lapkin</td>
+                        <td>Кусочек железа</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/pula.png" alt="" class="item-icon"></td>
+                        <td>Пуля</td>
+                        <td>Кусочек железа</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    
+    <section id="other">
+        <h2>Прочее</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="80">Иконка</th>
+                        <th>Переименование</th>
+                        <th>Предмет</th>
+                        <th>Особенность</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><img src="images/handcuffs.png" alt="" class="item-icon"></td>
+                        <td>Наручники</td>
+                        <td>Поводок</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/hqdbanana.png" alt="" class="item-icon"></td>
+                        <td>Ашка</td>
+                        <td>Свеча</td>
+                        <td>Изменяется от цвета свечи</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</main>
+
+<script>
+    // --- Логика верхней кнопки музыки (Play/Pause) ---
+    const musicBtn = document.getElementById('musicToggleBtn');
+    const bgMusic = document.getElementById('bgMusic');
+
+    musicBtn.addEventListener('click', () => {
+        if (bgMusic.paused) {
+            bgMusic.play();
+            musicBtn.textContent = '⏸️'; 
+        } else {
+            bgMusic.pause();
+            musicBtn.textContent = '▶️';
+        }
+    });
+
+    // --- Логика Секретной Страницы (Оверскролл вниз) ---
+    let overscrollAttempts = 0;
+    
+    // Я увеличил это значение с 15 до 80. 
+    // Если покажется, что листать нужно СЛИШКОМ долго — просто уменьши эту цифру (например, до 50).
+    // Если всё еще быстро — увеличь до 150.
+    const requiredAttempts = 80; 
+    
+    let isSecretActive = false;
+
+    // Функция проверки скролла
+    function checkOverscroll(delta) {
+        if (isSecretActive) return;
+        
+        // Проверяем, достиг ли пользователь самого низа страницы (с запасом 10px для погрешностей экранов)
+        const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 10;
+        
+        // Если пользователь внизу и пытается листать дальше вниз (delta > 0)
+        if (isAtBottom && delta > 0) {
+            overscrollAttempts++;
+            
+            if (overscrollAttempts >= requiredAttempts) {
+                activateSecret();
+            }
+        } else if (!isAtBottom) {
+            // Если он ушел наверх, сбрасываем счетчик
+            overscrollAttempts = 0;
+        }
+    }
+
+    // Для ПК (колесико мыши)
+    window.addEventListener('wheel', (e) => {
+        checkOverscroll(e.deltaY);
+    });
+
+    // Для смартфонов (свайпы)
+    let lastTouchY = 0;
+    window.addEventListener('touchstart', (e) => {
+        lastTouchY = e.touches[0].clientY;
+    }, {passive: true});
+
+    window.addEventListener('touchmove', (e) => {
+        let currentTouchY = e.touches[0].clientY;
+        // delta > 0 означает движение пальца вверх (скролл вниз)
+        checkOverscroll(lastTouchY - currentTouchY);
+        lastTouchY = currentTouchY;
+    }, {passive: true});
+
+    // Активация секретной страницы
+    function activateSecret() {
+        isSecretActive = true;
+        
+        const secretOverlay = document.getElementById('secretOverlay');
+        const secretMusic = document.getElementById('secretMusic');
+
+        // Открываем жуткий оверлей
+        secretOverlay.classList.remove('hidden');
+        
+        // Блокируем скролл основной страницы
+        document.body.style.overflow = 'hidden';
+        
+        // Выключаем фоновую музыку и прячем верхнюю кнопку
+        bgMusic.pause();
+        musicBtn.style.display = 'none'; 
+        
+        // Включаем секретную музыку
+        secretMusic.play();
+    }
+</script>
+
+
+</body>
+</html>
+        }
+
+        header { text-align: center; padding: 60px 20px; }
+
+        .logo-container {
+            display: inline-block;
+            font-size: 5.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            background: linear-gradient(rgb(255, 255, 255) 30%, rgb(88, 166, 255) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(rgba(88, 166, 255, 0.4) 0px 0px 20px);
+            letter-spacing: 12px;
+            font-family: Verdana, sans-serif;
+        }
+
+        main { max-width: 1000px; margin: 0 auto; padding: 20px 60px; }
+
+        section { margin-bottom: 100px; scroll-margin-top: 50px; }
+
+        h2 {
+            font-size: 2rem;
+            color: var(--accent);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 40px;
+        }
+
         /* --- НОВЫЙ БЛОК ОБНОВЛЕНИЙ И ТЕКСТ --- */
         .about-text {
             font-size: 1.1rem;
