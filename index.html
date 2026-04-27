@@ -118,6 +118,7 @@
 
         .item-icon { width: 100px; height: 100px; object-fit: contain; image-rendering: pixelated; }
 
+        /* Стили Сайдбара */
         .sidebar {
             position: fixed;
             top: 0; height: 100vh;
@@ -152,24 +153,93 @@
         .sidebar a { color: var(--text-main); text-decoration: none; font-size: 1.1rem; transition: 0.3s; }
         .sidebar a:hover { color: var(--accent); padding-left: 10px; }
 
-        .music-btn {
+        /* ПЛЕЕР */
+        .player-container {
             position: fixed;
-            top: 20px; right: 20px;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            z-index: 1100;
+        }
+
+        .music-btn {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            color: var(--accent);
             width: 50px; height: 50px;
             border-radius: 50%;
-            background-color: var(--surface-color);
-            border: 2px solid var(--accent);
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex; justify-content: center; align-items: center;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .music-btn:hover { border-color: var(--accent); transform: scale(1.05); }
+
+        .mini-player {
+            background: var(--surface-color);
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 10px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            width: 220px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            transform: translateY(-20px) scale(0.9);
+            pointer-events: none;
+        }
+
+        .mini-player.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: all;
+        }
+
+        .track-info {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
             color: var(--text-bright);
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ctrl-btn {
+            background: none;
+            border: none;
+            color: var(--text-main);
             font-size: 1.2rem;
             cursor: pointer;
-            z-index: 1100;
-            display: flex; align-items: center; justify-content: center;
-            transition: 0.3s;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            transition: 0.2s;
+            padding: 5px;
         }
-        .music-btn:hover { background-color: var(--table-hover); transform: scale(1.1); }
 
-        /* --- ПОЛНОЭКРАННЫЙ ОВЕРЛЕЙ --- */
+        .ctrl-btn:hover {
+            color: var(--accent);
+            transform: scale(1.2);
+        }
+
+        .ctrl-btn.play-pause {
+            font-size: 1.8rem;
+            color: var(--accent);
+        }
+
+        /* ЭФФЕКТЫ СЕКРЕТКИ */
         .fullscreen-overlay {
             position: fixed;
             top: 0; left: 0;
@@ -180,52 +250,23 @@
             overflow: hidden;
         }
         .fullscreen-overlay.hidden { display: none; }
-        
-        .fullscreen-overlay img {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            object-fit: cover; 
-            z-index: 1;
-            opacity: 0.7; 
-        }
+        .fullscreen-overlay img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; opacity: 0.7; }
 
-        /* --- АНИМАЦИЯ ТЕКСТА --- */
         .creepy-text {
-            position: relative;
-            z-index: 2;
-            color: #ff0000;
-            font-family: monospace, serif; /* Monospace делает символы одинаковой ширины, чтобы текст не дергался по длине */
-            font-size: 5vw;
-            text-align: center;
-            text-shadow: 0px 0px 15px #ff0000, 0px 0px 30px #8a0000;
-            text-transform: uppercase;
-            pointer-events: none;
-            margin: 0 20px;
-            opacity: 0; 
-            letter-spacing: 4px;
+            position: relative; z-index: 2; color: #ff0000; font-family: monospace;
+            font-size: 5vw; text-align: center; text-shadow: 0 0 15px #ff0000;
+            text-transform: uppercase; opacity: 0; letter-spacing: 4px;
         }
 
         .fade-in { animation: fadeIn 1s forwards; }
         .fade-out { animation: fadeOut 1s forwards; }
         .glitch-active { animation: glitch 0.15s linear infinite; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
         @keyframes glitch {
             0% { transform: translate(0); }
             20% { transform: translate(-4px, 4px); text-shadow: 3px 0 #3a0088, -3px 0 #ff0000; }
-            40% { transform: translate(-4px, -4px); text-shadow: -3px 0 #3a0088, 3px 0 #ff0000; }
-            60% { transform: translate(4px, 4px); text-shadow: 3px 0 #3a0088, -3px 0 #ff0000; }
-            80% { transform: translate(4px, -4px); text-shadow: -3px 0 #3a0088, 3px 0 #ff0000; }
             100% { transform: translate(0); }
         }
 
@@ -233,18 +274,29 @@
             main { padding: 20px 15px; }
             .logo-container { font-size: 3rem; letter-spacing: 5px; }
             .sidebar { width: 200px; }
-            h2 { font-size: 1.5rem; }
-            .music-btn { top: 10px; right: 10px; width: 45px; height: 45px; }
             .creepy-text { font-size: 10vw; } 
         }
     </style>
 </head>
 <body>
 
-<audio id="bgMusic" loop src="music/lofi.mp3"></audio>
-<audio id="secretMusic" loop src="music/page.mp3"></audio>
+<div class="player-container">
+    <button id="musicToggleBtn" class="music-btn" title="Музыка">🎵</button>
+    
+    <div id="miniPlayer" class="mini-player">
+        <div class="track-info">
+            <span id="trackName">Загрузка...</span>
+        </div>
+        <div class="controls">
+            <button id="prevBtn" class="ctrl-btn" title="Назад">⏮</button>
+            <button id="playPauseBtn" class="ctrl-btn play-pause" title="Играть/Пауза">▶</button>
+            <button id="nextBtn" class="ctrl-btn" title="Вперед">⏭</button>
+        </div>
+    </div>
+</div>
 
-<button id="musicToggleBtn" class="music-btn">▶️</button>
+<audio id="mainAudio"></audio>
+<audio id="secretMusic" loop src="music/page.mp3"></audio>
 
 <div id="secretOverlay" class="fullscreen-overlay hidden">
     <img src="page/page.gif" alt="Secret">
@@ -320,36 +372,6 @@
                         <td>Вырезанная тыква</td>
                         <td></td>
                     </tr>
-                    <tr>
-                        <td><img src="images/mlgglasses.png" alt="" class="item-icon"></td>
-                        <td>MLG Очки</td>
-                        <td>Вырезанная тыква</td>
-                        <td></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
-
-    <section id="swords">
-        <h2>Мечи</h2>
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th width="80">Иконка</th>
-                        <th>Переименование</th>
-                        <th>Предмет</th>
-                        <th>Особенность</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><img src="images/baton.png" alt="" class="item-icon"></td>
-                        <td>Дубинка</td>
-                        <td>Деревянный меч</td>
-                        <td></td>
-                    </tr>
                 </tbody>
             </table>
         </div>
@@ -375,12 +397,6 @@
                         <td>В левой руке принимает положение на спине</td>
                     </tr>
                     <tr>
-                        <td><img src="images/Obrez.png" alt="" class="item-icon"></td>
-                        <td>Обрез</td>
-                        <td>Арбалет</td>
-                        <td>В левой руке принимает положение на спине</td>
-                    </tr>
-                    <tr>
                         <td><img src="images/pistol.png" alt="" class="item-icon"></td>
                         <td>Пистолет</td>
                         <td>Арбалет</td>
@@ -390,243 +406,114 @@
             </table>
         </div>
     </section>
-    
-    <section id="arrows">
-        <h2>Стрелы</h2>
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th width="80">Иконка</th>
-                        <th>Переименование</th>
-                        <th>Предмет</th>
-                        <th>Особенность</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><img src="images/762kal.png" alt="" class="item-icon"></td>
-                        <td>7.62мм</td>
-                        <td>Стрела</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td><img src="images/12kal.png" alt="" class="item-icon"></td>
-                        <td>Картечь</td>
-                        <td>Стрела</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td><img src="images/magnum357.png" alt="" class="item-icon"></td>
-                        <td>357 Магнум</td>
-                        <td>Стрела</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td><img src="images/magnum357med.png" alt="" class="item-icon"></td>
-                        <td>Медный 357 Магнум</td>
-                        <td>Стрела</td>
-                        <td></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
-    
-    <section id="decor">
-        <h2>Декор</h2>
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th width="80">Иконка</th>
-                        <th>Переименование</th>
-                        <th>Предмет</th>
-                        <th>Особенность</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><img src="images/tv.png" alt="" class="item-icon"></td>
-                        <td>Телевизор</td>
-                        <td>Кусочек железа</td>
-                        <td>Анимированная текстура</td>
-                    </tr>
-                    <tr>
-                        <td><img src="images/tvssshadek.png" alt="" class="item-icon"></td>
-                        <td>СлипТВ</td>
-                        <td>Кусочек железа</td>
-                        <td>Анимированная текстура</td>
-                    </tr>
-                    <tr>
-                        <td><img src="images/iron_nugget.png" alt="" class="item-icon"></td>
-                        <td>Канделябр с 3 свечами</td>
-                        <td>Кусочек железа</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td><img src="images/maxmodel.png" alt="" class="item-icon"></td>
-                        <td>Maxim_Lapkin</td>
-                        <td>Кусочек железа</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td><img src="images/pula.png" alt="" class="item-icon"></td>
-                        <td>Пуля</td>
-                        <td>Кусочек железа</td>
-                        <td></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
-    
-    <section id="other">
-        <h2>Прочее</h2>
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th width="80">Иконка</th>
-                        <th>Переименование</th>
-                        <th>Предмет</th>
-                        <th>Особенность</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><img src="images/handcuffs.png" alt="" class="item-icon"></td>
-                        <td>Наручники</td>
-                        <td>Поводок</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td><img src="images/hqdbanana.png" alt="" class="item-icon"></td>
-                        <td>Ашка</td>
-                        <td>Свеча</td>
-                        <td>Изменяется от цвета свечи</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
-
 </main>
 
 <script>
-    const musicBtn = document.getElementById('musicToggleBtn');
-    const bgMusic = document.getElementById('bgMusic');
-    const secretMusic = document.getElementById('secretMusic');
+    // --- ПЛЕЕР И МУЗЫКА ---
+    const playlist = [
+        { name: "Lofi Minecraft", src: "music/track1.mp3" },
+        { name: "Ambient Relax", src: "music/track2.mp3" },
+        { name: "C418 - Sweden", src: "music/track3.mp3" }
+    ];
 
-    // Снимаем блокировку аудио
-    function unlockAudio() {
-        secretMusic.load(); 
-        bgMusic.load();
-        document.removeEventListener('click', unlockAudio);
-        document.removeEventListener('touchstart', unlockAudio);
+    let currentTrackIndex = 0;
+    const mainAudio = document.getElementById('mainAudio');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const trackNameDisplay = document.getElementById('trackName');
+    const miniPlayer = document.getElementById('miniPlayer');
+    const musicToggleBtn = document.getElementById('musicToggleBtn');
+
+    function loadTrack(index) {
+        const track = playlist[index];
+        mainAudio.src = track.src;
+        trackNameDisplay.textContent = track.name;
     }
-    document.addEventListener('click', unlockAudio);
-    document.addEventListener('touchstart', unlockAudio);
 
-    musicBtn.addEventListener('click', () => {
-        if (bgMusic.paused) {
-            bgMusic.play();
-            musicBtn.textContent = '⏸️'; 
+    function togglePlay() {
+        if (mainAudio.paused) {
+            mainAudio.play();
+            playPauseBtn.textContent = '⏸';
         } else {
-            bgMusic.pause();
-            musicBtn.textContent = '▶️';
+            mainAudio.pause();
+            playPauseBtn.textContent = '▶';
         }
+    }
+
+    // Инициализация первой песни
+    loadTrack(currentTrackIndex);
+
+    // Открытие/Закрытие плеера
+    musicToggleBtn.addEventListener('click', () => {
+        miniPlayer.classList.toggle('active');
     });
 
+    playPauseBtn.addEventListener('click', togglePlay);
+
+    document.getElementById('nextBtn').addEventListener('click', () => {
+        currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
+        loadTrack(currentTrackIndex);
+        mainAudio.play();
+        playPauseBtn.textContent = '⏸';
+    });
+
+    document.getElementById('prevBtn').addEventListener('click', () => {
+        currentTrackIndex = (currentTrackIndex - 1 + playlist.length) % playlist.length;
+        loadTrack(currentTrackIndex);
+        mainAudio.play();
+        playPauseBtn.textContent = '⏸';
+    });
+
+    // --- СЕКРЕТКА ---
+    const secretMusic = document.getElementById('secretMusic');
     let overscrollAttempts = 0;
     const requiredAttempts = 80; 
     let isSecretActive = false;
-    let glitchInterval;
 
-    function checkOverscroll(delta) {
+    window.addEventListener('wheel', (e) => {
         if (isSecretActive) return;
-        
         const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 10;
-        
-        if (isAtBottom && delta > 0) {
+        if (isAtBottom && e.deltaY > 0) {
             overscrollAttempts++;
-            if (overscrollAttempts >= requiredAttempts) {
-                activateSecret();
-            }
+            if (overscrollAttempts >= requiredAttempts) activateSecret();
         } else if (!isAtBottom) {
             overscrollAttempts = 0;
         }
-    }
-
-    window.addEventListener('wheel', (e) => checkOverscroll(e.deltaY));
-
-    let lastTouchY = 0;
-    window.addEventListener('touchstart', (e) => {
-        lastTouchY = e.touches[0].clientY;
-    }, {passive: true});
-
-    window.addEventListener('touchmove', (e) => {
-        let currentTouchY = e.touches[0].clientY;
-        checkOverscroll(lastTouchY - currentTouchY);
-        lastTouchY = currentTouchY;
-    }, {passive: true});
+    });
 
     function activateSecret() {
         isSecretActive = true;
-        
         const secretOverlay = document.getElementById('secretOverlay');
         const creepyText = document.getElementById('creepyText');
 
         secretOverlay.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
         
-        bgMusic.pause();
-        bgMusic.currentTime = 0; 
-        musicBtn.style.display = 'none'; 
+        mainAudio.pause();
+        musicToggleBtn.style.display = 'none';
+        miniPlayer.classList.remove('active');
         
-        let playPromise = secretMusic.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.log("Браузер заблокировал аудио. Сделайте клик по экрану.");
-            });
-        }
+        secretMusic.play();
 
         creepyText.textContent = "Ты листал слишком долго";
         creepyText.className = "creepy-text fade-in";
 
         setTimeout(() => {
             creepyText.className = "creepy-text fade-out";
-            
             setTimeout(() => {
                 creepyText.textContent = "С тобой все хорошо?";
                 creepyText.className = "creepy-text fade-in";
-                
                 setTimeout(() => {
-                    creepyText.className = "creepy-text fade-out";
-                    
-                    setTimeout(() => {
-                        // Запуск бесконечного генератора инопланетных рун
-                        startMinecraftGlitch(creepyText);
-                    }, 1000);
-                    
-                }, 3500);
-                
+                    startMinecraftGlitch(creepyText);
+                }, 3000);
             }, 1000);
-            
-        }, 3500);
+        }, 3000);
     }
 
-    // Функция генерации текста "как в столе зачарования"
     function startMinecraftGlitch(element) {
-        // Набор специфических символов, визуально похожих на Standard Galactic Alphabet
         const alienChars = "ࢭࣨݺࣱࣚᶎᵓᵍᶊᶷḀḃϯ҉҈Ғ࣯ࣳᴇ࣬ࣔࢯ";
-        
         element.className = "creepy-text glitch-active fade-in";
-        
-        // Меняем символы каждые 70мс
-        glitchInterval = setInterval(() => {
+        setInterval(() => {
             let randomText = "";
-            // Длина строки от 10 до 16 символов
             const length = Math.floor(Math.random() * 7) + 10; 
             for (let i = 0; i < length; i++) {
                 randomText += alienChars.charAt(Math.floor(Math.random() * alienChars.length));
@@ -634,6 +521,13 @@
             element.textContent = randomText;
         }, 70);
     }
+
+    // Фоновая анимация канваса (заглушка)
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize);
+    resize();
 </script>
 
 </body>
