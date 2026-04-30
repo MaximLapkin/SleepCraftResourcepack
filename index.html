@@ -1,5 +1,3 @@
-<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -85,6 +83,21 @@
         .updates-list { list-style: none; padding: 0; margin: 0; }
         .updates-list li { margin: 10px 0; }
         .updates-list li::before { content: "- "; color: var(--accent); font-weight: bold; }
+		
+		.alert-block {
+            border-left: 4px solid #ff0000;
+            background-color: var(--surface-color);
+            padding: 20px 30px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 60px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .alert-block h3 { margin-top: 0; color: var(--text-bright); }
+        
+        .alert-list { list-style: none; padding: 0; margin: 0; }
+        .alert-list li { margin: 10px 0; }
+        .alert-list li::before { content: "- "; color: var(--accent); font-weight: bold; }
 
         .table-wrapper {
             width: 100%;
@@ -346,12 +359,24 @@
         <strong>О СКРП:</strong> Добро пожаловать в базу данных ресурспака! Здесь собрана вся информация о кастомных предметах, механиках и переименованиях.
     </div>
 
-    <div class="updates-block">
-        <h3>Последние обновления</h3>
+	<div class="alert-block">
+        <h3><b>ВАЖНОЕ УВЕДОМЛЕНИЕ!</b></h3>
         <ul class="updates-list">
-            <li>Добавлены новые механики;</li>
-            <li>Обновлены текстуры для телевизора и декора;</li>
-            <li>Исправлены баги с отображением моделей в руках.</li>
+            <li>Внимание! Ресурспак находится в стадии активного тестирования</li>
+            <li>Некоторые модели могут отображаться некорректно</li>
+			
+			<li>На сайте присутствует пасхалка!</li>
+        </ul>
+    </div>
+
+    <div class="updates-block">
+        <h3><b>Последние обновления</b></h3>
+        <ul class="updates-list">
+            <li>Добавлены новые предметы;</li>
+            <li>Обновлены текстуры для предметов;</li>
+            <li>Обновлён сайт, добавлены новые предметы:</li>
+				<li>Мечи, Копья, Щиты, Тотемы, Шалкера, Зелья и Книги</li>
+			<li>Добавлена музыка справа - сверху сайта</li>
         </ul>
     </div>
 
@@ -455,49 +480,61 @@
                     <tr>
                         <td><img src="images/stopsigniron.png" alt="" class="item-icon"></td>
                         <td>Стоп знак</td>
-                        <td>Железное копьё</td>
+                        <td>Любое копьё</td>
                         <td></td>
                     </tr>
                     <tr>
                         <td><img src="images/noroad.png" alt="" class="item-icon"></td>
                         <td>Въезд запрещён</td>
-                        <td>Железное копьё</td>
+                        <td>Любое копьё</td>
                         <td></td>
                     </tr>
                     <tr>
                         <td><img src="images/nosign.png" alt="" class="item-icon"></td>
                         <td>Знак запрета</td>
-                        <td>Железное копьё</td>
+                        <td>Любое копьё</td>
                         <td></td>
                     </tr>
 					<tr>
                         <td><img src="images/fivesign.png" alt="" class="item-icon"></td>
-                        <td>Знак 50</td>
-                        <td>Железное копьё</td>
+                        <td>Знак 50 запрещено</td>
+                        <td>Любое копьё</td>
                         <td></td>
                     </tr>
 					<tr>
                         <td><img src="images/penissign.png" alt="" class="item-icon"></td>
-                        <td>Знак пенис</td>
-                        <td>Железное копьё</td>
+                        <td>Знак пенисы запрещены</td>
+                        <td>Любое копьё</td>
                         <td></td>
                     </tr>
 					<tr>
                         <td><img src="images/shahedsign.png" alt="" class="item-icon"></td>
-                        <td>Знак шахеды</td>
-                        <td>Железное копьё</td>
+                        <td>Знак шахеды запрещены</td>
+                        <td>Любое копьё</td>
                         <td></td>
                     </tr>
 					<tr>
                         <td><img src="images/tpssign.png" alt="" class="item-icon"></td>
-                        <td>Знак тпс</td>
-                        <td>Железное копьё</td>
+                        <td>Знак низкий тпс запрещен</td>
+                        <td>Любое копьё</td>
                         <td></td>
                     </tr>
 					<tr>
                         <td><img src="images/elytrasign.png" alt="" class="item-icon"></td>
-                        <td>Знак элитр</td>
-                        <td>Железное копьё</td>
+                        <td>Знак элитры запрещены</td>
+                        <td>Любое копьё</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td><img src="images/67sign.png" alt="" class="item-icon"></td>
+                        <td>Знак 67 запрещен</td>
+                        <td>Любое копьё</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td><img src="images/42sign.png" alt="" class="item-icon"></td>
+                        <td>Знак 42 запрещен</td>
+                        <td>Любое копьё</td>
                         <td></td>
                     </tr>
                 </tbody>
