@@ -1305,6 +1305,16 @@
         }
     }
 
+    function togglePlay() {
+        if (mainAudio.paused) {
+            mainAudio.play();
+            playPauseBtn.textContent = '⏸';
+        } else {
+            mainAudio.pause();
+            playPauseBtn.textContent = '▶';
+        }
+    }
+
     // Открытие/закрытие списка песен
     playlistToggleBtn.addEventListener('click', () => {
         playlistContainer.classList.toggle('show');
@@ -1315,15 +1325,18 @@
     loadTrack(currentTrackIndex);
     mainAudio.volume = volumeSlider.value;
 
-    // Инициализация первой песни
-    loadTrack(currentTrackIndex);
-
-    // Открытие/Закрытие плеера
     musicToggleBtn.addEventListener('click', () => {
         miniPlayer.classList.toggle('active');
     });
 
     playPauseBtn.addEventListener('click', togglePlay);
+
+    volumeSlider.addEventListener('input', (e) => {
+        mainAudio.volume = e.target.value;
+        if(typeof secretMusic !== 'undefined') {
+            secretMusic.volume = e.target.value; 
+        }
+    });
 
     document.getElementById('nextBtn').addEventListener('click', () => {
         currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
@@ -1398,7 +1411,6 @@
         }, 70);
     }
 
-    // Фоновая анимация канваса (заглушка)
     const canvas = document.getElementById('bgCanvas');
     const ctx = canvas.getContext('2d');
     function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
