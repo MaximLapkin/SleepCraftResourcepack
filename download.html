@@ -655,6 +655,16 @@
         }
     }
 
+    function togglePlay() {
+        if (mainAudio.paused) {
+            mainAudio.play();
+            playPauseBtn.textContent = '⏸';
+        } else {
+            mainAudio.pause();
+            playPauseBtn.textContent = '▶';
+        }
+    }
+
     // Открытие/закрытие списка песен
     playlistToggleBtn.addEventListener('click', () => {
         playlistContainer.classList.toggle('show');
@@ -662,9 +672,6 @@
 
     // Инициализация
     renderPlaylist();
-    loadTrack(currentTrackIndex);
-    mainAudio.volume = volumeSlider.value;
-
     loadTrack(currentTrackIndex);
     mainAudio.volume = volumeSlider.value;
 
