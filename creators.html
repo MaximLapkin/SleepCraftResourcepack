@@ -1,0 +1,866 @@
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>СКРП - Создатели</title>
+    <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=pvjjFgKLsFL-fXbNbIbFGSGtV60K5RA8xLyA8u7b5MDkzWDcLAF0711CR53h8KSogzFW4-TbB0qVQrWWPsHBYHkqfMM-yk_GvWVammIrhUCbxBQa5PEfvsElhGjt805TM7QNxcPzOvCHEWZiXDReVjdQba6ngIzCuKEb7Tsro_r2t4tGz4kn6SZGnH4f0Pd-Ff6xg_5BiLmcbU7fCgxZGrrp8pFfQf7r1_YURi66qYSBt_tCkdGEB4mpcI3Bu33eelSutm0c4rQNbx9tUgSVbBd-oJDArRIkzWfLEf-ysQ5Q509rB8BVyeyzoxL5vZLE" charset="UTF-8"></script><style>
+        :root {
+            --bg-color: #0b0e14;
+            --surface-color: #161b22;
+            --table-header: #21262d;
+            --table-row: #0d1117;
+            --table-hover: #1f2937;
+            --border-color: #30363d;
+            --text-main: #c9d1d9;
+            --text-bright: #ffffff;
+            --accent: #58a6ff;
+            
+            /* Цветовая палитра кнопок */
+            --pastel-green: #a3e635;
+            --pastel-green-hover: #bef264;
+            --pastel-red: #f87171;
+            --pastel-red-hover: #fca5a5;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Inter, -apple-system, system-ui, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        #bgCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        header { text-align: center; padding: 60px 20px; position: relative; }
+
+        /* Кнопка НАЗАД */
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 1100;
+        }
+        .back-btn:hover {
+            border-color: var(--accent);
+            color: var(--text-bright);
+            transform: translateX(-3px);
+        }
+
+        .logo-container {
+            display: inline-block;
+            font-size: 5.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            background: linear-gradient(rgb(255, 255, 255) 30%, rgb(88, 166, 255) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(rgba(88, 166, 255, 0.4) 0px 0px 20px);
+            letter-spacing: 12px;
+            font-family: Verdana, sans-serif;
+        }
+
+        main { max-width: 1100px; margin: 0 auto; padding: 20px 40px; }
+
+        /* --- НОВЫЕ СТИЛИ ДЛЯ СТРАНИЦЫ СОЗДАТЕЛЕЙ --- */
+        
+        .creators-section {
+            margin-bottom: 60px;
+        }
+
+        .creators-row {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .creator-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--accent);
+            border-radius: 12px;
+            padding: 30px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-align: center;
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        /* Контейнер для фото/скриншота */
+        .photo-box {
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 20px;
+            background-color: #21262d;
+            border: 3px solid var(--border-color);
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #8b949e;
+            font-size: 0.9rem;
+            transition: border-color 0.3s, transform 0.3s;
+        }
+
+        .creator-card:hover .photo-box {
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .photo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .creator-name {
+            font-size: 1.5rem;
+            color: var(--text-bright);
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .creator-role {
+            font-size: 1rem;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        /* 4-ое место (меньше, под правым местом) */
+        .sub-creator-container {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 0 0 12px 12px;
+            margin-left: -20px;
+            margin-right: -20px;
+            margin-bottom: -30px;
+            padding-bottom: 20px;
+        }
+
+        .sub-photo-box {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 10px;
+            background-color: #21262d;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #8b949e;
+            font-size: 0.75rem;
+            text-align: center;
+        }
+        
+        .sub-photo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .sub-creator-name {
+            font-size: 1.1rem;
+            color: var(--text-bright);
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .sub-creator-role {
+            font-size: 0.85rem;
+            color: var(--text-main);
+        }
+
+        /* Помощь в разработке */
+        .helpers-section {
+            text-align: center;
+            margin-top: 70px;
+            margin-bottom: 50px;
+        }
+
+        .helpers-title {
+            font-size: 1.8rem;
+            color: var(--text-bright);
+            margin-bottom: 30px;
+            display: inline-block;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+        }
+
+        .helpers-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .helper-item {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            transition: 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .helper-item:hover {
+            border-color: var(--accent);
+            background-color: var(--table-hover);
+            transform: translateX(5px);
+        }
+
+        .helper-photo {
+            width: 50px;
+            height: 50px;
+            background-color: #21262d;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            margin-right: 25px;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #8b949e;
+            font-size: 0.7rem;
+            overflow: hidden;
+        }
+        
+        .helper-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .helper-name {
+            font-size: 1.15rem;
+            color: var(--text-bright);
+            font-weight: bold;
+            min-width: 180px;
+            text-align: left;
+        }
+
+        .helper-role {
+            font-size: 1rem;
+            color: var(--text-main);
+            text-align: left;
+            flex-grow: 1;
+            border-left: 1px solid var(--border-color);
+            padding-left: 20px;
+        }
+
+        /* Правый Сайдбар */
+        .sidebar {
+            position: fixed;
+            top: 0; height: 100vh;
+            background: rgba(13, 17, 23, 0.95);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 0 30px; box-sizing: border-box;
+        }
+
+        .sidebar.right { right: 0; width: 250px; border-right: none; transform: translateX(100%); }
+        .sidebar:hover { transform: translateX(0); }
+
+        .tab {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            padding: 30px 10px; cursor: pointer;
+            color: var(--accent); font-weight: bold; text-transform: uppercase;
+            letter-spacing: 3px; writing-mode: vertical-rl; font-size: 0.9rem;
+        }
+
+        .right .tab { left: -42px; border-right: none; border-radius: 10px 0 0 10px; }
+
+        .sidebar h3 { color: var(--text-bright); border-bottom: 1px solid var(--accent); padding-bottom: 10px; margin-bottom: 20px; }
+        .sidebar ul { list-style: none; padding: 0; }
+        .sidebar li { margin: 20px 0; }
+        .sidebar a { color: var(--text-main); text-decoration: none; font-size: 1.1rem; transition: 0.3s; }
+        .sidebar a:hover { color: var(--accent); padding-left: 10px; }
+
+        /* ПЛЕЕР С РЕГУЛИРОВКОЙ ЗВУКА */
+        .player-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            z-index: 1100;
+        }
+
+        .music-btn {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            color: var(--accent);
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex; justify-content: center; align-items: center;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .music-btn:hover { border-color: var(--accent); transform: scale(1.05); }
+
+        .mini-player {
+            background: var(--surface-color);
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 10px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            width: 220px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            transform: translateY(-20px) scale(0.9);
+            pointer-events: none;
+        }
+
+        .mini-player.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: all;
+        }
+
+        .track-info {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            color: var(--text-bright);
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ctrl-btn {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.2s;
+            padding: 5px;
+        }
+
+        .ctrl-btn:hover {
+            color: var(--accent);
+            transform: scale(1.2);
+        }
+
+        .ctrl-btn.play-pause {
+            font-size: 1.8rem;
+            color: var(--accent);
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 15px;
+            gap: 10px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
+        }
+
+        #volumeSlider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            background: var(--border-color);
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        #volumeSlider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        #volumeSlider::-webkit-slider-thumb:hover {
+            transform: scale(1.3);
+            background: var(--text-bright);
+        }
+		
+		/* --- СТИЛИ СПИСКА ПЕСЕН --- */
+        .playlist-container {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, margin-top 0.3s ease-out;
+        }
+
+        .playlist-container.show {
+            max-height: 140px;
+            overflow-y: auto;
+            margin-top: 10px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 10px;
+        }
+
+        .playlist-item {
+            padding: 8px 10px;
+            margin-bottom: 5px;
+            background: var(--table-row);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .playlist-item:hover {
+            background: var(--table-hover);
+            color: var(--text-bright);
+        }
+
+        .playlist-item.active {
+            background: rgba(88, 166, 255, 0.15); 
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .playlist-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        .playlist-container::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+
+        /* ЭФФЕКТЫ СЕКРЕТКИ */
+        .fullscreen-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background-color: black;
+            z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden;
+        }
+        .fullscreen-overlay.hidden { display: none; }
+        .fullscreen-overlay img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; opacity: 0.7; }
+
+        .creepy-text {
+            position: relative; z-index: 2; color: #ff0000; font-family: monospace;
+            font-size: 5vw; text-align: center; text-shadow: 0 0 15px #ff0000;
+            text-transform: uppercase; opacity: 0; letter-spacing: 4px;
+        }
+
+        .fade-in { animation: fadeIn 1s forwards; }
+        .fade-out { animation: fadeOut 1s forwards; }
+        .glitch-active { animation: glitch 0.15s linear infinite; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-4px, 4px); text-shadow: 3px 0 #3a0088, -3px 0 #ff0000; }
+            100% { transform: translate(0); }
+        }
+
+        /* Адаптивность для мобилок */
+        @media screen and (max-width: 850px) {
+            main { padding: 20px 15px; }
+            .logo-container { font-size: 3.5rem; letter-spacing: 5px; }
+            .sidebar { width: 200px; }
+            .creepy-text { font-size: 10vw; }
+            
+            .helper-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            .helper-photo {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            .helper-name {
+                text-align: center;
+                margin-bottom: 8px;
+            }
+            .helper-role {
+                text-align: center;
+                border-left: none;
+                border-top: 1px solid var(--border-color);
+                padding-left: 0;
+                padding-top: 10px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<a href="index.html" class="back-btn">← Назад на базу</a>
+
+<div class="player-container">
+    <button id="musicToggleBtn" class="music-btn" title="Музыка">🎵</button>
+    
+    <div id="miniPlayer" class="mini-player">
+        <div class="track-info">
+            <span id="trackName">Загрузка...</span>
+        </div>
+        <div class="controls">
+            <button id="prevBtn" class="ctrl-btn" title="Назад">⏮</button>
+            <button id="playPauseBtn" class="ctrl-btn play-pause" title="Играть/Пауза">▶</button>
+            <button id="nextBtn" class="ctrl-btn" title="Вперед">⏭</button>
+        </div>
+        
+        <div style="text-align: center; margin-top: 8px;">
+            <button id="playlistToggleBtn" class="ctrl-btn" style="font-size: 0.85rem; opacity: 0.8;">📑 Список песен</button>
+        </div>
+        <ul id="playlistContainer" class="playlist-container">
+            </ul>
+
+        <div class="volume-control">
+            <span style="font-size: 0.8rem; color: var(--text-main);">🔈</span>
+            <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5">
+            <span style="font-size: 0.8rem; color: var(--text-main);">🔊</span>
+        </div>
+    </div>
+</div>
+
+<audio id="mainAudio"></audio>
+<audio id="secretMusic" loop src="music/page.mp3"></audio>
+
+<div id="secretOverlay" class="fullscreen-overlay hidden">
+    <img src="page/page.gif" alt="Secret">
+    <h1 id="creepyText" class="creepy-text"></h1>
+</div>
+
+<canvas id="bgCanvas"></canvas>
+
+<div class="sidebar right">
+    <div class="tab">Ссылки</div>
+    <h3>Ресурсы</h3>
+    <ul>
+        <li><a href="https://maximlapkin.github.io/SleepCraftResourcepack/" target="_blank" rel="noopener noreferrer">🌐 Главная</a></li>
+        <li><a href="#">👑 Создатели</a></li>
+        <li><a href="https://t.me/SCRPNews" target="_blank" rel="noopener noreferrer">💬 Телеграм канал</a></li>
+		<li><a href="https://discord.gg/epDpBA3D" target="_blank" rel="noopener noreferrer">💬 Дискорд SleepCraft'а</a></li>
+        <li><a href="#">💎 Донат</a></li>
+    </ul>
+</div>
+
+<header>
+    <div class="logo-container">СОЗДАТЕЛИ</div>
+</header>
+
+<main>
+    <!-- БЛОК СОЗДАТЕЛЕЙ (3 ОСНОВНЫХ МЕСТА + 1 ДОП) -->
+    <div class="creators-section">
+        <div class="creators-row">
+            
+            <!-- Место 1 -->
+            <div class="creator-card">
+                <div class="photo-box">
+                    <!-- Замените src на ваш путь к фото -->
+                    <img src="https://via.placeholder.com/140/21262d/8b949e?text=Фото" alt="Фото создателя">
+                </div>
+                <div class="creator-name">Никнейм 1</div>
+                <div class="creator-role">Главный Разработчик</div>
+            </div>
+
+            <!-- Место 2 -->
+            <div class="creator-card">
+                <div class="photo-box">
+                    <img src="https://via.placeholder.com/140/21262d/8b949e?text=Фото" alt="Фото создателя">
+                </div>
+                <div class="creator-name">Никнейм 2</div>
+                <div class="creator-role">3D Моделлер (Blockbench)</div>
+            </div>
+
+            <!-- Место 3 (с 4-ым местом внутри) -->
+            <div class="creator-card">
+                <div class="photo-box">
+                    <img src="https://via.placeholder.com/140/21262d/8b949e?text=Фото" alt="Фото создателя">
+                </div>
+                <div class="creator-name">Никнейм 3</div>
+                <div class="creator-role">Звукорежиссер / Дизайн</div>
+
+                <!-- 4-ое место (меньше, под 3-им) -->
+                <div class="sub-creator-container">
+                    <div class="sub-photo-box">
+                        <img src="https://via.placeholder.com/80/21262d/8b949e?text=Фото" alt="Фото помощника">
+                    </div>
+                    <div class="sub-creator-name">Никнейм 4</div>
+                    <div class="sub-creator-role">Помощник / Кодер</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- БЛОК "ПОМОЩЬ В РАЗРАБОТКЕ" -->
+    <div class="helpers-section">
+        <h2 class="helpers-title">Помощь в разработке</h2>
+        <div class="helpers-list">
+            
+            <!-- Помощник 1 -->
+            <div class="helper-item">
+                <div class="helper-photo">
+                    <img src="https://via.placeholder.com/50/21262d/8b949e?text=Фото" alt="Фото">
+                </div>
+                <div class="helper-name">Имя / Никнейм</div>
+                <div class="helper-role">Тестирование версии 1.21.11, поиск багов и проверка CEM анимаций.</div>
+            </div>
+
+            <!-- Помощник 2 -->
+            <div class="helper-item">
+                <div class="helper-photo">
+                    <img src="https://via.placeholder.com/50/21262d/8b949e?text=Фото" alt="Фото">
+                </div>
+                <div class="helper-name">Имя / Никнейм</div>
+                <div class="helper-role">Написание HTML/CSS кода, помощь с сайтом.</div>
+            </div>
+            
+            <!-- Помощник 3 -->
+            <div class="helper-item">
+                <div class="helper-photo">
+                    <img src="https://via.placeholder.com/50/21262d/8b949e?text=Фото" alt="Фото">
+                </div>
+                <div class="helper-name">Имя / Никнейм</div>
+                <div class="helper-role">Генерация музыкального сопровождения.</div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<script>
+    // --- ПЛЕЕР И МУЗЫКА ---
+    const playlist = [
+        { name: "Lofi", src: "music/lofi.mp3" },
+        { name: "LoFi c418 - Moog City", src: "music/LoFi c418 - Moog City.mp3" },
+        { name: "LoFi c418 - Living Mice", src: "music/LoFi c418 - Living Mice.mp3" }
+    ];
+
+    let currentTrackIndex = 0;
+    const mainAudio = document.getElementById('mainAudio');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const trackNameDisplay = document.getElementById('trackName');
+    const miniPlayer = document.getElementById('miniPlayer');
+    const musicToggleBtn = document.getElementById('musicToggleBtn');
+    const volumeSlider = document.getElementById('volumeSlider');
+    
+    // Новые переменные для плейлиста
+    const playlistToggleBtn = document.getElementById('playlistToggleBtn');
+    const playlistContainer = document.getElementById('playlistContainer');
+
+    // Функция создания элементов списка
+    function renderPlaylist() {
+        playlistContainer.innerHTML = ''; 
+        playlist.forEach((track, index) => {
+            const li = document.createElement('li');
+            li.className = 'playlist-item';
+            li.textContent = track.name;
+            li.onclick = () => {
+                currentTrackIndex = index;
+                loadTrack(currentTrackIndex);
+                mainAudio.play();
+                playPauseBtn.textContent = '⏸';
+            };
+            playlistContainer.appendChild(li);
+        });
+    }
+
+    // Функция подсветки текущего трека в списке
+    function updateActiveTrackInList() {
+        const items = playlistContainer.querySelectorAll('.playlist-item');
+        items.forEach((item, index) => {
+            if (index === currentTrackIndex) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    }
+
+    // Обновленная функция загрузки трека (теперь она вызывает обновление подсветки)
+    function loadTrack(index) {
+        const track = playlist[index];
+        mainAudio.src = track.src;
+        trackNameDisplay.textContent = track.name;
+        if (playlistContainer.children.length > 0) {
+            updateActiveTrackInList();
+        }
+    }
+
+    function togglePlay() {
+        if (mainAudio.paused) {
+            mainAudio.play();
+            playPauseBtn.textContent = '⏸';
+        } else {
+            mainAudio.pause();
+            playPauseBtn.textContent = '▶';
+        }
+    }
+
+    // Открытие/закрытие списка песен
+    playlistToggleBtn.addEventListener('click', () => {
+        playlistContainer.classList.toggle('show');
+    });
+
+    // Инициализация
+    renderPlaylist();
+    loadTrack(currentTrackIndex);
+    mainAudio.volume = volumeSlider.value;
+
+    musicToggleBtn.addEventListener('click', () => {
+        miniPlayer.classList.toggle('active');
+    });
+
+    playPauseBtn.addEventListener('click', togglePlay);
+
+    volumeSlider.addEventListener('input', (e) => {
+        mainAudio.volume = e.target.value;
+        if(typeof secretMusic !== 'undefined') {
+            secretMusic.volume = e.target.value; 
+        }
+    });
+
+    document.getElementById('nextBtn').addEventListener('click', () => {
+        currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
+        loadTrack(currentTrackIndex);
+        mainAudio.play();
+        playPauseBtn.textContent = '⏸';
+    });
+
+    document.getElementById('prevBtn').addEventListener('click', () => {
+        currentTrackIndex = (currentTrackIndex - 1 + playlist.length) % playlist.length;
+        loadTrack(currentTrackIndex);
+        mainAudio.play();
+        playPauseBtn.textContent = '⏸';
+    });
+
+    // --- СЕКРЕТКА ---
+    const secretMusic = document.getElementById('secretMusic');
+    let overscrollAttempts = 0;
+    const requiredAttempts = 80; 
+    let isSecretActive = false;
+
+    window.addEventListener('wheel', (e) => {
+        if (isSecretActive) return;
+        const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 10;
+        if (isAtBottom && e.deltaY > 0) {
+            overscrollAttempts++;
+            if (overscrollAttempts >= requiredAttempts) activateSecret();
+        } else if (!isAtBottom) {
+            overscrollAttempts = 0;
+        }
+    });
+
+    function activateSecret() {
+        isSecretActive = true;
+        const secretOverlay = document.getElementById('secretOverlay');
+        const creepyText = document.getElementById('creepyText');
+
+        secretOverlay.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        
+        mainAudio.pause();
+        musicToggleBtn.style.display = 'none';
+        miniPlayer.classList.remove('active');
+        
+        secretMusic.play();
+
+        creepyText.textContent = "Ты листал слишком долго";
+        creepyText.className = "creepy-text fade-in";
+
+        setTimeout(() => {
+            creepyText.className = "creepy-text fade-out";
+            setTimeout(() => {
+                creepyText.textContent = "С тобой все хорошо?";
+                creepyText.className = "creepy-text fade-in";
+                setTimeout(() => {
+                    startMinecraftGlitch(creepyText);
+                }, 3000);
+            }, 1000);
+        }, 3000);
+    }
+
+    function startMinecraftGlitch(element) {
+        const alienChars = "ࢭࣨݺࣱࣚᶎᵓᵍᶊᶷḀḃϯ҉҈Ғ࣯ࣳᴇ࣬ࣔࢯ";
+        element.className = "creepy-text glitch-active fade-in";
+        setInterval(() => {
+            let randomText = "";
+            const length = Math.floor(Math.random() * 7) + 10; 
+            for (let i = 0; i < length; i++) {
+                randomText += alienChars.charAt(Math.floor(Math.random() * alienChars.length));
+            }
+            element.textContent = randomText;
+        }, 70);
+    }
+
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize);
+    resize();
+</script>
+
+</body>
+</html>
