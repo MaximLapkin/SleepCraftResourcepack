@@ -134,40 +134,102 @@
 
         .item-icon { width: 100px; height: 100px; object-fit: contain; image-rendering: pixelated; }
 
-        /* Стили Сайдбара */
-        .sidebar {
-            position: fixed;
-            top: 0; height: 100vh;
-            background: rgba(13, 17, 23, 0.95);
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(12px);
-            z-index: 1000;
-            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex; flex-direction: column; justify-content: center;
-            padding: 0 30px; box-sizing: border-box;
-        }
+		/* ===== САЙДБАРЫ ===== */
 
-        .sidebar.left { left: 0; width: 250px; border-left: none; transform: translateX(-100%); }
-        .sidebar.right { right: 0; width: 250px; border-right: none; transform: translateX(100%); }
-        .sidebar:hover { transform: translateX(0); }
+		/* Обёртка: только позиционирование, мышь НЕ ловит */
+		.sidebar-wrapper {
+			position: fixed;
+			top: 0;
+			height: 100vh;
+			width: 250px;
+			z-index: 1000;
+			pointer-events: none;
+		}
+		.sidebar-wrapper.left  { left: 0; }
+		.sidebar-wrapper.right { right: 0; }
 
-        .tab {
-            position: absolute; top: 50%; transform: translateY(-50%);
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            padding: 30px 10px; cursor: pointer;
-            color: var(--accent); font-weight: bold; text-transform: uppercase;
-            letter-spacing: 3px; writing-mode: vertical-rl; font-size: 0.9rem;
-        }
+		/* Скользящая панель */
+		.sidebar {
+			position: absolute;
+			top: 0;
+			height: 100vh;
+			width: 250px;
+			background: rgba(13, 17, 23, 0.95);
+			border: 1px solid var(--border-color);
+			backdrop-filter: blur(12px);
+			transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+			display: flex;
+			flex-direction: column;
+			box-sizing: border-box;
+			pointer-events: auto;
+		}
+		.sidebar-wrapper.left  .sidebar { left: 0;  border-left: none;  transform: translateX(-100%); }
+		.sidebar-wrapper.right .sidebar { right: 0; border-right: none; transform: translateX(100%); }
+		.sidebar.open { transform: translateX(0) !important; }
 
-        .left .tab { right: -42px; border-left: none; border-radius: 0 10px 10px 0; }
-        .right .tab { left: -42px; border-right: none; border-radius: 10px 0 0 10px; }
+		/* Ярлычок */
+		.tab {
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+			background: var(--surface-color);
+			border: 1px solid var(--border-color);
+			padding: 30px 10px;
+			cursor: pointer;
+			color: var(--accent);
+			font-weight: bold;
+			text-transform: uppercase;
+			letter-spacing: 3px;
+			writing-mode: vertical-rl;
+			font-size: 0.9rem;
+			z-index: 10;
+		}
+		.sidebar-wrapper.left  .tab { right: -42px; border-left: none;  border-radius: 0 10px 10px 0; }
+		.sidebar-wrapper.right .tab { left: -42px;  border-right: none; border-radius: 10px 0 0 10px; }
 
-        .sidebar h3 { color: var(--text-bright); border-bottom: 1px solid var(--accent); padding-bottom: 10px; margin-bottom: 20px; }
-        .sidebar ul { list-style: none; padding: 0; }
-        .sidebar li { margin: 20px 0; }
-        .sidebar a { color: var(--text-main); text-decoration: none; font-size: 1.1rem; transition: 0.3s; }
-        .sidebar a:hover { color: var(--accent); padding-left: 10px; }
+		/* Скролл-контейнер (занимает всю высоту панели) */
+		.sidebar-content {
+			flex: 1;
+			min-height: 0;             /* критично для работы скролла во flex */
+			overflow-y: auto;
+			display: flex;
+			flex-direction: column;
+			scrollbar-width: thin;     /* Firefox */
+			scrollbar-color: var(--accent) transparent;
+		}
+
+		/* Скроллбар СЛЕВА у левого сайдбара */
+		.sidebar-wrapper.left .sidebar-content { direction: rtl; }
+		.sidebar-wrapper.left .sidebar-inner   { direction: ltr; }
+
+		/* Внутренний блок: центр по Y когда места хватает, скролл сверху когда нет */
+		.sidebar-inner {
+			margin: auto 0;
+			padding: 20px 30px;
+		}
+
+		/* Заголовок и список */
+		.sidebar h3 {
+			color: var(--text-bright);
+			border-bottom: 1px solid var(--accent);
+			padding-bottom: 10px;
+			margin: 0 0 20px 0;
+		}
+		.sidebar ul { list-style: none; padding: 0; margin: 0; }
+		.sidebar li { margin: 20px 0; }
+		.sidebar a {
+			color: var(--text-main);
+			text-decoration: none;
+			font-size: 1.1rem;
+			transition: 0.3s;
+		}
+		.sidebar a:hover { color: var(--accent); padding-left: 10px; }
+
+		/* Скроллбар для Chrome/Edge/Safari */
+		.sidebar-content::-webkit-scrollbar { width: 5px; }
+		.sidebar-content::-webkit-scrollbar-track { background: transparent; }
+		.sidebar-content::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+		.sidebar-content::-webkit-scrollbar-thumb:hover { background: var(--text-bright); }
 
         /* ПЛЕЕР */
         .player-container {
@@ -178,6 +240,7 @@
             flex-direction: column;
             align-items: flex-end;
             z-index: 1100;
+			pointer-events: none;
         }
 
         .music-btn {
@@ -191,6 +254,7 @@
             display: flex; justify-content: center; align-items: center;
             transition: 0.3s;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+			pointer-events: auto;
         }
 
         .music-btn:hover { border-color: var(--accent); transform: scale(1.05); }
@@ -425,40 +489,53 @@
 
 <canvas id="bgCanvas"></canvas>
 
-<div class="sidebar left">
-    <div class="tab">Содержание</div>
-    <h3>Навигация</h3>
-    <ul>
-        <li><a href="#Accessories">🎀 Аксессуары</a></li>
-		<li><a href="#mace">🪨 Булавы</a></li>
-        <li><a href="#swords">⚔️ Мечи</a></li>
-		<li><a href="#pickaxe">⛏️ Кирки</a></li>
-		<li><a href="#shovel">⚒️ Лопаты</a></li>
-		<li><a href="#spear">🗡️ Копья</a></li>
-		<li><a href="#shield">🛡️ Щиты</a></li>
-		<li><a href="#totem">💊️ Тотемы</a></li>
-        <li><a href="#crossbow">🏹 Арбалеты</a></li>
-        <li><a href="#arrows">🏹 Стрелы</a></li>
-		<li><a href="#shulker">🧳 Шалкера</a></li>
-        <li><a href="#decor">🖼️ Декор</a></li>
-		<li><a href="#potion">🥛 Зелья</a></li>
-		<li><a href="#book">📕 Книги</a></li>
-		<li><a href="#games">🃏 Игры</a></li>
-        <li><a href="#other">📌 Прочее</a></li>
-    </ul>
+<div class="sidebar-wrapper left">
+    <div class="sidebar">
+        <div class="tab">Содержание</div>
+        <div class="sidebar-content">
+            <div class="sidebar-inner">
+                <h3>Навигация</h3>
+                <ul>
+                    <li><a href="#Accessories">🎀 Аксессуары</a></li>
+                    <li><a href="#mace">🪨 Булавы</a></li>
+                    <li><a href="#swords">⚔️ Мечи</a></li>
+                    <li><a href="#pickaxe">⛏️ Кирки</a></li>
+                    <li><a href="#shovel">⚒️ Лопаты</a></li>
+                    <li><a href="#spear">🗡️ Копья</a></li>
+                    <li><a href="#shield">🛡️ Щиты</a></li>
+                    <li><a href="#totem">💊️ Тотемы</a></li>
+                    <li><a href="#crossbow">🏹 Арбалеты</a></li>
+                    <li><a href="#arrows">🏹 Стрелы</a></li>
+                    <li><a href="#shulker">🧳 Шалкера</a></li>
+                    <li><a href="#decor">🖼️ Декор</a></li>
+					<li><a href="#food">🍕 Еда</a></li>
+                    <li><a href="#potion">🥛 Зелья</a></li>
+                    <li><a href="#book">📕 Книги</a></li>
+                    <li><a href="#games">🃏 Игры</a></li>
+                    <li><a href="#other">📌 Прочее</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div class="sidebar right">
-    <div class="tab">Ссылки</div>
-    <h3>Ресурсы</h3>
-    <ul>
-        <li><a href="download.html">⬇️ Скачать РП</a></li>
-		<li><a href="index.html" target="_blank" rel="noopener noreferrer">🌐 Сайт СКРП</a></li>
-        <li><a href="creators.html">👑 Создатели</a></li>
-        <li><a href="https://t.me/SCRPNews" target="_blank" rel="noopener noreferrer">💬 Телеграм канал</a></li>
-		<li><a href="https://discord.gg/VH3EFQGYZF" target="_blank" rel="noopener noreferrer">💬 Дискорд SleepCraft</a></li>
-        <li><a href="#">💎 Донат</a></li>
-    </ul>
+<div class="sidebar-wrapper right">
+    <div class="sidebar">
+        <div class="tab">Ссылки</div>
+        <div class="sidebar-content">
+            <div class="sidebar-inner">
+                <h3>Ресурсы</h3>
+                <ul>
+                    <li><a href="download.html">⬇️ Скачать РП</a></li>
+                    <li><a href="index.html">🌐 Сайт СКРП</a></li>
+                    <li><a href="creators.html">👑 Создатели</a></li>
+                    <li><a href="https://t.me/SCRPNews" target="_blank" rel="noopener noreferrer">💬 Телеграм канал</a></li>
+                    <li><a href="https://discord.gg/VH3EFQGYZF" target="_blank" rel="noopener noreferrer">💬 Дискорд SleepCraft</a></li>
+                    <li><a href="#">💎 Донат</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
 
 <header>
@@ -574,6 +651,12 @@
 					<tr>
                         <td><img src="images/jotoroCepka6.png" alt="" class="item-icon"></td>
                         <td>Крутая кепка Джоторо</td>
+                        <td>Вырезанная тыква</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td><img src="images/protivogaz.png" alt="" class="item-icon"></td>
+                        <td>Противогаз</td>
                         <td>Вырезанная тыква</td>
                         <td></td>
                     </tr>
@@ -698,12 +781,6 @@
                         <td></td>
 					</tr>
 					<tr>
-                        <td><img src="images/kol.png" alt="" class="item-icon"></td>
-                        <td>Колосажатель</td>
-                        <td>Любой меч</td>
-                        <td></td>
-                    </tr>
-					<tr>
                         <td><img src="images/bloodsword.png" alt="" class="item-icon"></td>
                         <td>Кровавый меч</td>
                         <td>Любой меч</td>
@@ -772,6 +849,30 @@
 					<tr>
                         <td><img src="images/lifekatana.png" alt="" class="item-icon"></td>
                         <td>Катана жизни</td>
+                        <td>Любой меч</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td><img src="images/lifekatana.png" alt="" class="item-icon"></td>
+                        <td>Морковка</td>
+                        <td>Любой меч</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td><img src="images/lifekatana.png" alt="" class="item-icon"></td>
+                        <td>Меч-револьвер</td>
+                        <td>Любой меч</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td><img src="images/lifekatana.png" alt="" class="item-icon"></td>
+                        <td>Рубиновый меч</td>
+                        <td>Любой меч</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td><img src="images/lifekatana.png" alt="" class="item-icon"></td>
+                        <td>Кагоцурубэ Иссин</td>
                         <td>Любой меч</td>
                         <td></td>
                     </tr>
@@ -904,7 +1005,13 @@
 					<tr>
                         <td><img src="images/kol.png" alt="" class="item-icon"></td>
                         <td>Колосажатель</td>
-                        <td>Любой меч</td>
+                        <td>Любое копьё</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td><img src="images/kol.png" alt="" class="item-icon"></td>
+                        <td>Кий</td>
+                        <td>Любое копьё</td>
                         <td></td>
                     </tr>
                 </tbody>
@@ -1012,19 +1119,8 @@
 							<td></td>
 						</tr>
 						<tr>
-							<td><img src="images/kakawka.png" alt="" class="item-icon"></td>
-							<td>Какашек</td>
-							<td>Тотем</td>
-							<td><p><b>Несколько вариантов:</b></p>
-								<p>- Дубайский шоколад</p>
-								<p>- Золотая какашка</p>
-								<p>- Гавно равена</p>
-								<p><s>- Пикми какашка</s></p>
-							</td>
-						</tr>
-						<tr>
-							<td><img src="images/heart_totem.png" alt="" class="item-icon"></td>
-							<td>Сердечная гармония</td>
+							<td><img src="images/clown.png" alt="" class="item-icon"></td>
+							<td>Клоун</td>
 							<td>Тотем</td>
 							<td></td>
 						</tr>
@@ -1034,7 +1130,7 @@
 		</section>
 
     <section id="crossbow">
-        <h2>Арбалеты</h2>
+        <h2>Огнестрельное оружие</h2>
         <div class="table-wrapper">
             <table>
                 <thead>
@@ -1049,37 +1145,73 @@
                     <tr>
                         <td><img src="images/rujo.png" alt="" class="item-icon"></td>
                         <td>Руджо</td>
-                        <td>Арбалет</td>
+                        <td>Арбалет|Осколок эха</td>
                         <td>В левой руке принимает положение на спине</td>
                     </tr>
                     <tr>
                         <td><img src="images/Obrez.png" alt="" class="item-icon"></td>
                         <td>Обрез</td>
-                        <td>Арбалет</td>
+                        <td>Арбалет|Осколок эха</td>
                         <td>В левой руке принимает положение на спине</td>
                     </tr>
                     <tr>
                         <td><img src="images/pistol.png" alt="" class="item-icon"></td>
                         <td>Пистолет</td>
-                        <td>Арбалет</td>
+                        <td>Арбалет|Осколок эха</td>
                         <td>В левой руке принимает положение у виска</td>
                     </tr>
 					 <tr>
                         <td><img src="images/revolver.png" alt="" class="item-icon"></td>
                         <td>Револьвер</td>
-                        <td>Арбалет</td>
+                        <td>Арбалет|Осколок эха</td>
                         <td></td>
                     </tr>
 					<tr>
                         <td><img src="images/alukard.png" alt="" class="item-icon"></td>
                         <td>Пистолеты алукард</td>
-                        <td>Арбалет</td>
+                        <td>Арбалет|Осколок эха</td>
                         <td></td>
                     </tr>
 					<tr>
                         <td><img src="images/pistodet.png" alt="" class="item-icon"></td>
                         <td>Медный пистолет</td>
-                        <td>Арбалет</td>
+                        <td>Арбалет|Осколок эха</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td><img src="images/PP.png" alt="" class="item-icon"></td>
+                        <td>ПП Узи</td>
+                        <td>Арбалет|Осколок эха</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td><img src="images/pistoletPulimet.png" alt="" class="item-icon"></td>
+                        <td>Пистолет-пулемет</td>
+                        <td>Арбалет|Осколок эха</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td><img src="images/drobovik.png" alt="" class="item-icon"></td>
+                        <td>Дробовик</td>
+                        <td>Арбалет|Осколок эха</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td><img src="images/gloc.png" alt="" class="item-icon"></td>
+                        <td>Глок</td>
+                        <td>Арбалет|Осколок эха</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td><img src="images/portal.png" alt="" class="item-icon"></td>
+                        <td>Портальная пушка</td>
+                        <td>Арбалет|Осколок эха</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td><img src="images/lazer.png" alt="" class="item-icon"></td>
+                        <td>Лазерная пушка</td>
+                        <td>Арбалет|Осколок эха</td>
                         <td></td>
                     </tr>
                 </tbody>
@@ -1178,6 +1310,24 @@
                     </tr>
                 </thead>
                 <tbody>
+					<tr>
+                        <td><img src="images/zaluzi.png" alt="" class="item-icon"></td>
+                        <td>Жалюзи</td>
+                        <td>Кожаная конская броня</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td><img src="images/flag.png" alt="" class="item-icon"></td>
+                        <td>Флаг</td>
+                        <td>Кожаная конская броня</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td><img src="images/americaflag.png" alt="" class="item-icon"></td>
+                        <td>Флаг США</td>
+                        <td>Железный слиток</td>
+                        <td></td>
+                    </tr>
                     <tr>
                         <td><img src="images/tv.png" alt="" class="item-icon"></td>
                         <td>Телевизор</td>
@@ -1280,6 +1430,89 @@
                         <td>Железный слиток</td>
                         <td></td>
                     </tr>
+					<tr>
+                        <td><img src="images/GoldenRacuchca.png" alt="" class="item-icon"></td>
+                        <td>Ракушки</td>
+                        <td>Бумага</td>
+                        <td><p><b>Названия:</b></p>
+						<p>Золотая ракушка - Золотой слиток</p>
+						<p>Синяя ракушка - Лазурит</p>
+						<p>Серебряная ракушка - Железный слиток</p>
+                    </tr>
+					<tr>
+                        <td><img src="images/KIllGTA4.png" alt="" class="item-icon"></td>
+                        <td>Красное задание</td>
+                        <td>Железный слиток</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td><img src="images/gta4.png" alt="" class="item-icon"></td>
+                        <td>Задание</td>
+                        <td>Железный слиток</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td><img src="images/GTA.png" alt="" class="item-icon"></td>
+                        <td>Миссия</td>
+                        <td>Железный слиток</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td><img src="images/belrak.png" alt="" class="item-icon"></td>
+                        <td>Ракушки
+						<p><b>Названия:</b></p>
+						<p>Ракушка</p>
+						<p>Розовая ракушка</p>
+						<p>Белая ракушка</p>
+						</td>
+                        <td>Железный слиток</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+	
+		<section id="food">
+        <h2>Еда</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="80">Иконка</th>
+                        <th>Переименование</th>
+                        <th>Предмет</th>
+                        <th>Особенность</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><img src="images/burger.png" alt="" class="item-icon"></td>
+                        <td>Бургер</td>
+                        <td>
+						<p>Жареная свинина</p>
+						<p>Стейк</p>
+						<p>Золотая морковь</p>
+						</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/potatoFree.png" alt="" class="item-icon"></td>
+                        <td>Картошка фри</td>
+                        <td>
+						<p>Жареная свинина</p>
+						<p>Стейк</p>
+						<p>Печёный картофель</p>
+						<p>Золотая морковь</p>
+						</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td><img src="images/bread.png" alt="" class="item-icon"></td>
+                        <td>Хлебушек</td>
+                        <td>Хлеб</td>
+                        <td></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -1343,8 +1576,56 @@
                     <tr>
                         <td><img src="images/dokument.png" alt="" class="item-icon"></td>
                         <td>Документ</td>
-                        <td>Книга с пером</td>
-                        <td>Подписывается</td>
+                        <td>Книга с пером|Подписанная книга</td>
+                        <td>Подписывается (так же и на подписанную книгу)</td>
+                    </tr>
+					<tr>
+                        <td><img src="images/pismo.png" alt="" class="item-icon"></td>
+                        <td>Письмо</td>
+                        <td>Книга с пером|Подписанная книга</td>
+                        <td>Подписывается (так же и на подписанную книгу)</td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/pasport.png" alt="" class="item-icon"></td>
+                        <td>Паспорт</td>
+                        <td>Подписанная книга</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td><img src="images/shtraf.png" alt="" class="item-icon"></td>
+                        <td>Штраф</td>
+                        <td>Подписанная книга</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td><img src="images/closeBookS.png" alt="" class="item-icon">
+						<img src="images/closeBookG.png" alt="" class="item-icon">
+						<img src="images/closeBookEnd.png" alt="" class="item-icon">
+						<img src="images/closeBookH.png" alt="" class="item-icon">
+						<img src="images/closeBookPink.png" alt="" class="item-icon">
+						<img src="images/closeBookKing.png" alt="" class="item-icon">
+						</td>
+                        <td>
+						<p><b>Названия:</b></p>
+						<p>Алмазный переплет</p>
+						<p>Зеленый переплет</p>
+						<p>Коричневый переплет</p>
+						<p>Красный переплет</p>
+						<p>Фиолетовый переплет</p>
+						<p>Эндер переплет</p>
+						<p>Дневник Том 1</p>
+						<p>Дневник Том 2</p>
+						<p>Дневник Том 3</p>
+						<p>Желтый переплет Том 1</p>
+						<p>Желтый переплет Том 2</p>
+						<p>Желтый переплет Том 3</p>
+						<p>Жуткая книга</p>
+						<p>Королевский переплет</p>
+						<p>Розовый переплет</p>
+						<p>Страшный переплет</p>
+						</td>
+                        <td>Книга с пером|Подписанная книга</td>
+                        <td>Подписывается (так же и на подписанную книгу)</td>
                     </tr>
                 </tbody>
             </table>
@@ -1386,6 +1667,15 @@
 						<p>Белый конь|Конь</p>
 						<p>Белая пешка|Пешка</p>
 						<p>Белый слон|Слон</p>
+						</td>
+                    </tr>
+					<tr>
+                        <td><img src="images/whiteshashki.png" alt="" class="item-icon"></td>
+                        <td>Шашки</td>
+                        <td>Железный Слиток</td>
+                        <td><p><b>Название зависит от цвета:</b></p>
+						<p>Шашка</p>
+						<p>Негр шашка</p>
 						</td>
                     </tr>
                 </tbody>
@@ -1609,6 +1899,30 @@
     function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     window.addEventListener('resize', resize);
     resize();
+	
+	// --- САЙДБАРЫ ---
+	document.querySelectorAll('.sidebar').forEach(sidebar => {
+		const tab = sidebar.querySelector('.tab');
+		let closeTimer;
+
+		const open = () => {
+			clearTimeout(closeTimer);
+			sidebar.classList.add('open');
+		};
+		const scheduleClose = () => {
+			clearTimeout(closeTimer);
+			closeTimer = setTimeout(() => sidebar.classList.remove('open'), 400);
+		};
+
+		// Панель: открытие при входе, закрытие с задержкой при уходе
+		sidebar.addEventListener('mouseenter', open);
+		sidebar.addEventListener('mouseleave', scheduleClose);
+
+		// Ярлычок дополнительно гарантированно открывает панель,
+		// но НЕ вешаем на него закрытие — иначе были "скачки"
+		tab.addEventListener('mouseenter', open);
+	});
+
 </script>
 
 </body>
