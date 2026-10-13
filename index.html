@@ -235,10 +235,10 @@
         .player-container {
             position: fixed;
             top: 20px;
-            right: 20px;
+            left: 20px;
             display: flex;
             flex-direction: column;
-            align-items: flex-end;
+            align-items: flex-start;
             z-index: 1100;
 			pointer-events: none;
         }
@@ -448,8 +448,37 @@
             .sidebar { width: 200px; }
             .creepy-text { font-size: 10vw; } 
         }
+		
+		.admin-entry-btn {
+		position: fixed;
+		top: 20px;
+		right: 20px;
+		z-index: 1000;
+		background: var(--surface-color);
+		border: 1px solid var(--accent);
+		color: var(--accent);
+		padding: 8px 16px;
+		border-radius: 8px;
+		cursor: pointer;
+		font-size: 0.9rem;
+		font-weight: 500;
+		box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+		transition: 0.3s;
+		}
+		.admin-entry-btn:hover {
+			background: var(--accent);
+			color: var(--surface-color);
+			transform: scale(1.05);
+		}
     </style>
 </head>
+
+<!-- Кнопка входа (видна всем) -->
+<button id="loginBtn" class="admin-entry-btn" onclick="location.href='login.html'">🔐 Панель</button>
+
+<!-- Кнопка выхода (скрыта по умолчанию) -->
+<button id="logoutBtn" class="admin-entry-btn" style="display: none; background: #ff4d4d; border-color: #ff4d4d; color: white;">🚪 Выйти</button>
+
 <body>
 
 <div class="player-container">
@@ -2114,6 +2143,33 @@
 		tab.addEventListener('mouseenter', open);
 	});
 
+</script>
+
+<script src="users.js"></script>
+<script>
+    const isAdmin = localStorage.getItem('adminLoggedIn') === 'true';
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    
+    if (isAdmin) {
+        console.log("Режим администратора активирован. Пользователь:", localStorage.getItem('adminUser'));
+        
+        // Скрываем кнопку входа, показываем кнопку выхода
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'block';
+        
+        // Включаем визуальный режим админа (готовимся к плюсам!)
+        document.body.classList.add('admin-mode'); 
+    }
+
+    // Логика кнопки выхода
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminUser');
+            window.location.reload(); // Перезагружаем страницу, чтобы сбросить режим
+        });
+    }
 </script>
 
 </body>

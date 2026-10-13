@@ -1,0 +1,7 @@
+// users.js
+// Внимание: эти хеши получены из пароля + секретной "соли". 
+// Онлайн-дешифраторы их не узнают.
+const ADMIN_USERS = {
+    "Maxim_Lapkin": "c118b093dc361f83770c6a37b2772e9ea0ff1ec737025c4e11ad2cf97bcbbd01",
+    "SR_Simon": "c118b093dc361f83770c6a37b2772e9ea0ff1ec737025c4e11ad2cf97bcbbd01"
+};
