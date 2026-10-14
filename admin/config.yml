@@ -9,15 +9,18 @@ public_folder: "images"
 collections:
   - name: "models"
     label: "Модели ресурспака"
-    file: "models.json"
-    fields:
-      - label: "Список всех моделей"
-        name: "models"
-        widget: "list"
-        summary: "{{fields.name}} ({{fields.category}})"
+    files:
+      - name: "models_list"
+        label: "Список моделей"
+        file: "models.json"
         fields:
-          - { label: "Категория", name: "category", widget: "select", options: ["Аксессуары", "Элитры", "Булавы", "Мечи", "Кирки", "Лопаты", "Копья", "Щиты", "Тотемы", "Огнестрельное оружие", "Стрелы", "Шалкера", "Декор", "Стойки для брони", "Еда", "Зелья", "Книги", "Игры", "Прочее"] }
-          - { label: "Иконка (загрузи файл)", name: "icon", widget: "image" }
-          - { label: "Переименование", name: "name", widget: "string" }
-          - { label: "Предмет", name: "item", widget: "string" }
-          - { label: "Особенность", name: "feature", widget: "text", required: false }
+          - label: "Список всех моделей"
+            name: "models"
+            widget: "list"
+            summary: "{{fields.name}} ({{fields.category}})"
+            fields:
+              - { label: "Категория", name: "category", widget: "select", options: ["Аксессуары", "Элитры", "Булавы", "Мечи", "Кирки", "Лопаты", "Копья", "Щиты", "Тотемы", "Огнестрельное оружие", "Стрелы", "Шалкера", "Декор", "Стойки для брони", "Еда", "Зелья", "Книги", "Игры", "Прочее"] }
+              - { label: "Иконка (загрузи файл)", name: "icon", widget: "image" }
+              - { label: "Переименование", name: "name", widget: "string" }
+              - { label: "Предмет", name: "item", widget: "string" }
+              - { label: "Особенность", name: "feature", widget: "text", required: false }
