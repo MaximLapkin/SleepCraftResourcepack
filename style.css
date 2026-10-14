@@ -440,4 +440,24 @@
             .sidebar { width: 200px; }
             .creepy-text { font-size: 10vw; } 
         }
+		
+		.admin-entry-btn {
+			position: fixed;
+			top: 20px;
+			left: 20px;
+			background: var(--surface-color);
+			border: 1px solid var(--border-color);
+			color: var(--accent);
+			padding: 10px 20px;
+			border-radius: 8px;
+			cursor: pointer;
+			font-weight: bold;
+			z-index: 1100;
+			transition: 0.3s;
+		}
+		.admin-entry-btn:hover {
+			border-color: var(--accent);
+			transform: scale(1.05);
+		}
+		
 	}
