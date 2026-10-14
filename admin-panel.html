@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель СКРП</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #1a1a1a; color: #e0e0e0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #58a6ff; margin-bottom: 20px; }
+        .login-box { background: #2a2a2a; padding: 30px; border-radius: 12px; max-width: 400px; margin: 100px auto; }
+        .login-box input { width: 100%; padding: 10px; margin: 10px 0; background: #1a1a1a; border: 1px solid #444; color: #e0e0e0; border-radius: 6px; }
+        .login-box button { width: 100%; padding: 10px; background: #58a6ff; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .admin-panel { display: none; }
+        .admin-panel.active { display: block; }
+        .model-list { background: #2a2a2a; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        .model-item { background: #1a1a1a; padding: 15px; margin: 10px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .model-item img { width: 50px; height: 50px; object-fit: contain; }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin: 0 5px; }
+        .btn-edit { background: #58a6ff; color: white; }
+        .btn-delete { background: #ff4d4d; color: white; }
+        .btn-add { background: #28a745; color: white; padding: 12px 24px; font-size: 1rem; }
+        .btn-download { background: #ffc107; color: #000; padding: 12px 24px; font-size: 1rem; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: #2a2a2a; padding: 30px; border-radius: 12px; width: 500px; max-width: 90%; }
+        .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 10px; margin: 10px 0; background: #1a1a1a; border: 1px solid #444; color: #e0e0e0; border-radius: 6px; }
+        .modal-content label { display: block; margin-top: 10px; color: #58a6ff; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-save { background: #28a745; color: white; flex: 1; }
+        .btn-cancel { background: #ff4d4d; color: white; }
+        .error { color: #ff4d4d; margin-top: 10px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Форма входа -->
+        <div class="login-box" id="loginBox">
+            <h2>🔐 Вход в админ-панель</h2>
+            <input type="text" id="username" placeholder="Логин">
+            <input type="password" id="password" placeholder="Пароль">
+            <button onclick="login()">Войти</button>
+            <div class="error" id="errorMsg">Неверный логин или пароль!</div>
+        </div>
+
+        <!-- Админ-панель -->
+        <div class="admin-panel" id="adminPanel">
+            <h1>🛠️ Админ-панель СКРП</h1>
+            <div style="margin-bottom: 20px;">
+                <button class="btn btn-add" onclick="openAddModal()">➕ Добавить модель</button>
+                <button class="btn btn-download" onclick="downloadModels()">📥 Скачать models.json</button>
+                <button class="btn" style="background: #ff4d4d; color: white;" onclick="logout()">🚪 Выйти</button>
+            </div>
+            <div class="model-list" id="modelList"></div>
+        </div>
+    </div>
+
+    <!-- Модальное окно добавления/редактирования -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Добавить модель</h3>
+            <label>Категория:</label>
+            <select id="category">
+                <option>Аксессуары</option>
+                <option>Элитры</option>
+                <option>Булавы</option>
+                <option>Мечи</option>
+                <option>Кирки</option>
+                <option>Лопаты</option>
+                <option>Копья</option>
+                <option>Щиты</option>
+                <option>Тотемы</option>
+                <option>Огнестрельное оружие</option>
+                <option>Стрелы</option>
+                <option>Шалкера</option>
+                <option>Декор</option>
+                <option>Стойки для брони</option>
+                <option>Еда</option>
+                <option>Зелья</option>
+                <option>Книги</option>
+                <option>Игры</option>
+                <option>Прочее</option>
+            </select>
+            <label>Иконка (путь к изображению):</label>
+            <input type="text" id="icon" placeholder="images/example.png">
+            <label>Переименование (название):</label>
+            <input type="text" id="name" placeholder="Например: Крутой меч">
+            <label>Предмет:</label>
+            <input type="text" id="item" placeholder="Например: Любой меч">
+            <label>Особенность:</label>
+            <textarea id="feature" rows="3" placeholder="Например: Анимированная текстура"></textarea>
+            <div class="modal-actions">
+                <button class="btn btn-save" onclick="saveModel()">💾 Сохранить</button>
+                <button class="btn btn-cancel" onclick="closeModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="users.js"></script>
+    <script>
+        let models = [];
+        let editingIndex = -1;
+
+        async function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMsg');
+
+            // Хеширование пароля
+            const msgUint8 = new TextEncoder().encode(password + "SCRP_Salt_2024_Secret_Key_!@#");
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashedPass = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+            if (ADMIN_USERS[username] && ADMIN_USERS[username] === hashedPass) {
+                localStorage.setItem('adminLoggedIn', 'true');
+                localStorage.setItem('adminUser', username);
+                showAdminPanel();
+            } else {
+                errorMsg.style.display = 'block';
+                setTimeout(() => errorMsg.style.display = 'none', 3000);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminUser');
+            location.reload();
+        }
+
+        async function showAdminPanel() {
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('adminPanel').classList.add('active');
+            await loadModels();
+        }
+
+        async function loadModels() {
+            try {
+                const response = await fetch('models.json');
+                const data = await response.json();
+                models = data.models || [];
+                renderModels();
+            } catch (error) {
+                console.error('Ошибка загрузки models.json:', error);
+                models = [];
+                renderModels();
+            }
+        }
+
+        function renderModels() {
+            const list = document.getElementById('modelList');
+            list.innerHTML = '<h2>Список моделей (' + models.length + ')</h2>';
+            
+            models.forEach((model, index) => {
+                const item = document.createElement('div');
+                item.className = 'model-item';
+                item.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <img src="${model.icon}" alt="${model.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2250%22 height=%2250%22><rect width=%2250%22 height=%2250%22 fill=%22%23444%22/></svg>'">
+                        <div>
+                            <strong>${model.name}</strong><br>
+                            <small style="color: #888;">${model.category} | ${model.item}</small>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-edit" onclick="editModel(${index})">✏️ Редактировать</button>
+                        <button class="btn btn-delete" onclick="deleteModel(${index})">🗑️ Удалить</button>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function openAddModal() {
+            editingIndex = -1;
+            document.getElementById('modalTitle').textContent = 'Добавить модель';
+            document.getElementById('category').value = 'Мечи';
+            document.getElementById('icon').value = '';
+            document.getElementById('name').value = '';
+            document.getElementById('item').value = '';
+            document.getElementById('feature').value = '';
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function editModel(index) {
+            editingIndex = index;
+            const model = models[index];
+            document.getElementById('modalTitle').textContent = 'Редактировать модель';
+            document.getElementById('category').value = model.category;
+            document.getElementById('icon').value = model.icon;
+            document.getElementById('name').value = model.name;
+            document.getElementById('item').value = model.item;
+            document.getElementById('feature').value = model.feature || '';
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        function saveModel() {
+            const model = {
+                category: document.getElementById('category').value,
+                icon: document.getElementById('icon').value,
+                name: document.getElementById('name').value,
+                item: document.getElementById('item').value,
+                feature: document.getElementById('feature').value
+            };
+
+            if (editingIndex === -1) {
+                models.push(model);
+            } else {
+                models[editingIndex] = model;
+            }
+
+            closeModal();
+            renderModels();
+            alert('Модель сохранена! Не забудь нажать "Скачать models.json" и загрузить файл на GitHub.');
+        }
+
+        function deleteModel(index) {
+            if (confirm('Удалить модель "' + models[index].name + '"?')) {
+                models.splice(index, 1);
+                renderModels();
+            }
+        }
+
+        function downloadModels() {
+            const data = JSON.stringify({ models: models }, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'models.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Проверка входа при загрузке
+        if (localStorage.getItem('adminLoggedIn') === 'true') {
+            showAdminPanel();
+        }
+    </script>
+</body>
+</html>
