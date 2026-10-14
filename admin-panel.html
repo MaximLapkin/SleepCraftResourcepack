@@ -14,82 +14,70 @@
         .login-box button { width: 100%; padding: 10px; background: #58a6ff; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .admin-panel { display: none; }
         .admin-panel.active { display: block; }
-        .model-list { background: #2a2a2a; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
-        .model-item { background: #1a1a1a; padding: 15px; margin: 10px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .model-item img { width: 50px; height: 50px; object-fit: contain; }
-        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin: 0 5px; }
-        .btn-edit { background: #58a6ff; color: white; }
-        .btn-delete { background: #ff4d4d; color: white; }
-        .btn-add { background: #28a745; color: white; padding: 12px 24px; font-size: 1rem; }
-        .btn-download { background: #ffc107; color: #000; padding: 12px 24px; font-size: 1rem; }
+        .toolbar { margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.95rem; }
+        .btn-add { background: #28a745; color: white; }
+        .btn-download { background: #ffc107; color: #000; }
+        .btn-logout { background: #ff4d4d; color: white; }
+        .btn-add-cat { background: #6f42c1; color: white; }
+        .category-block { background: #2a2a2a; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        .category-block h2 { color: #58a6ff; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        .model-item { background: #1a1a1a; padding: 12px 15px; margin: 8px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .model-item img { width: 40px; height: 40px; object-fit: contain; margin-right: 15px; }
+        .model-info { display: flex; align-items: center; flex: 1; }
+        .model-details { flex: 1; }
+        .model-details strong { color: #e0e0e0; }
+        .model-details small { color: #888; display: block; margin-top: 3px; }
+        .model-actions { display: flex; gap: 8px; }
+        .btn-edit { background: #58a6ff; color: white; padding: 6px 12px; font-size: 0.85rem; }
+        .btn-delete { background: #ff4d4d; color: white; padding: 6px 12px; font-size: 0.85rem; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
         .modal.active { display: flex; }
-        .modal-content { background: #2a2a2a; padding: 30px; border-radius: 12px; width: 500px; max-width: 90%; }
-        .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 10px; margin: 10px 0; background: #1a1a1a; border: 1px solid #444; color: #e0e0e0; border-radius: 6px; }
-        .modal-content label { display: block; margin-top: 10px; color: #58a6ff; }
+        .modal-content { background: #2a2a2a; padding: 30px; border-radius: 12px; width: 500px; max-width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 10px; margin: 8px 0; background: #1a1a1a; border: 1px solid #444; color: #e0e0e0; border-radius: 6px; }
+        .modal-content label { display: block; margin-top: 12px; color: #58a6ff; font-size: 0.9rem; }
         .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
-        .btn-save { background: #28a745; color: white; flex: 1; }
-        .btn-cancel { background: #ff4d4d; color: white; }
+        .btn-save { background: #28a745; color: white; flex: 1; padding: 12px; }
+        .btn-cancel { background: #ff4d4d; color: white; padding: 12px; }
         .error { color: #ff4d4d; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Форма входа -->
         <div class="login-box" id="loginBox">
-            <h2>🔐 Вход в админ-панель</h2>
+            <h2> Вход в админ-панель</h2>
             <input type="text" id="username" placeholder="Логин">
             <input type="password" id="password" placeholder="Пароль">
             <button onclick="login()">Войти</button>
             <div class="error" id="errorMsg">Неверный логин или пароль!</div>
         </div>
 
-        <!-- Админ-панель -->
         <div class="admin-panel" id="adminPanel">
             <h1>🛠️ Админ-панель СКРП</h1>
-            <div style="margin-bottom: 20px;">
+            <div class="toolbar">
                 <button class="btn btn-add" onclick="openAddModal()">➕ Добавить модель</button>
+                <button class="btn btn-add-cat" onclick="openAddCategoryModal()">📁 Добавить категорию</button>
                 <button class="btn btn-download" onclick="downloadModels()">📥 Скачать models.json</button>
-                <button class="btn" style="background: #ff4d4d; color: white;" onclick="logout()">🚪 Выйти</button>
+                <button class="btn btn-logout" onclick="logout()">🚪 Выйти</button>
             </div>
-            <div class="model-list" id="modelList"></div>
+            <div id="modelList"></div>
         </div>
     </div>
 
-    <!-- Модальное окно добавления/редактирования -->
+    <!-- Модалка модели -->
     <div class="modal" id="modal">
         <div class="modal-content">
             <h3 id="modalTitle">Добавить модель</h3>
             <label>Категория:</label>
-            <select id="category">
-                <option>Аксессуары</option>
-                <option>Элитры</option>
-                <option>Булавы</option>
-                <option>Мечи</option>
-                <option>Кирки</option>
-                <option>Лопаты</option>
-                <option>Копья</option>
-                <option>Щиты</option>
-                <option>Тотемы</option>
-                <option>Огнестрельное оружие</option>
-                <option>Стрелы</option>
-                <option>Шалкера</option>
-                <option>Декор</option>
-                <option>Стойки для брони</option>
-                <option>Еда</option>
-                <option>Зелья</option>
-                <option>Книги</option>
-                <option>Игры</option>
-                <option>Прочее</option>
-            </select>
-            <label>Иконка (путь к изображению):</label>
+            <select id="category"></select>
+            <label>Иконка (путь):</label>
             <input type="text" id="icon" placeholder="images/example.png">
-            <label>Переименование (название):</label>
-            <input type="text" id="name" placeholder="Например: Крутой меч">
+            <label>Переименование:</label>
+            <input type="text" id="name" placeholder="Название">
             <label>Предмет:</label>
-            <input type="text" id="item" placeholder="Например: Любой меч">
+            <input type="text" id="item" placeholder="Предмет">
             <label>Особенность:</label>
-            <textarea id="feature" rows="3" placeholder="Например: Анимированная текстура"></textarea>
+            <textarea id="feature" rows="3" placeholder="Описание"></textarea>
             <div class="modal-actions">
                 <button class="btn btn-save" onclick="saveModel()">💾 Сохранить</button>
                 <button class="btn btn-cancel" onclick="closeModal()">Отмена</button>
@@ -97,9 +85,23 @@
         </div>
     </div>
 
+    <!-- Модалка категории -->
+    <div class="modal" id="categoryModal">
+        <div class="modal-content">
+            <h3>📁 Добавить новую категорию</h3>
+            <label>Название категории:</label>
+            <input type="text" id="newCategoryName" placeholder="Например: Броня">
+            <div class="modal-actions">
+                <button class="btn btn-save" onclick="addCategory()">💾 Добавить</button>
+                <button class="btn btn-cancel" onclick="closeCategoryModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
     <script src="users.js"></script>
     <script>
         let models = [];
+        let categories = [];
         let editingIndex = -1;
 
         async function login() {
@@ -107,7 +109,6 @@
             const password = document.getElementById('password').value;
             const errorMsg = document.getElementById('errorMsg');
 
-            // Хеширование пароля
             const msgUint8 = new TextEncoder().encode(password + "SCRP_Salt_2024_Secret_Key_!@#");
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
             const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -140,42 +141,72 @@
                 const response = await fetch('models.json');
                 const data = await response.json();
                 models = data.models || [];
+                categories = data.categories || [];
                 renderModels();
             } catch (error) {
-                console.error('Ошибка загрузки models.json:', error);
+                console.error('Ошибка загрузки:', error);
                 models = [];
+                categories = [];
                 renderModels();
             }
         }
 
         function renderModels() {
             const list = document.getElementById('modelList');
-            list.innerHTML = '<h2>Список моделей (' + models.length + ')</h2>';
-            
-            models.forEach((model, index) => {
-                const item = document.createElement('div');
-                item.className = 'model-item';
-                item.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <img src="${model.icon}" alt="${model.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2250%22 height=%2250%22><rect width=%2250%22 height=%2250%22 fill=%22%23444%22/></svg>'">
-                        <div>
-                            <strong>${model.name}</strong><br>
-                            <small style="color: #888;">${model.category} | ${model.item}</small>
+            list.innerHTML = '';
+
+            if (categories.length === 0) {
+                list.innerHTML = '<p style="color: #888;">Нет категорий. Добавьте первую!</p>';
+                return;
+            }
+
+            categories.forEach(category => {
+                const modelsInCat = models.filter(m => m.category === category);
+                
+                const block = document.createElement('div');
+                block.className = 'category-block';
+                
+                let modelsHTML = modelsInCat.map((model, idx) => {
+                    const realIndex = models.indexOf(model);
+                    return `
+                        <div class="model-item">
+                            <div class="model-info">
+                                <img src="${model.icon}" alt="" onerror="this.style.display='none'">
+                                <div class="model-details">
+                                    <strong>${model.name}</strong>
+                                    <small>${model.item}${model.feature ? ' • ' + model.feature : ''}</small>
+                                </div>
+                            </div>
+                            <div class="model-actions">
+                                <button class="btn btn-edit" onclick="editModel(${realIndex})">✏️</button>
+                                <button class="btn btn-delete" onclick="deleteModel(${realIndex})">🗑️</button>
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <button class="btn btn-edit" onclick="editModel(${index})">✏️ Редактировать</button>
-                        <button class="btn btn-delete" onclick="deleteModel(${index})">🗑️ Удалить</button>
-                    </div>
+                    `;
+                }).join('');
+
+                if (modelsInCat.length === 0) {
+                    modelsHTML = '<p style="color: #666; font-style: italic;">Нет моделей в этой категории</p>';
+                }
+
+                block.innerHTML = `
+                    <h2>${category} (${modelsInCat.length})</h2>
+                    ${modelsHTML}
                 `;
-                list.appendChild(item);
+                list.appendChild(block);
             });
+        }
+
+        function populateCategorySelect() {
+            const select = document.getElementById('category');
+            select.innerHTML = categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
         }
 
         function openAddModal() {
             editingIndex = -1;
             document.getElementById('modalTitle').textContent = 'Добавить модель';
-            document.getElementById('category').value = 'Мечи';
+            populateCategorySelect();
+            document.getElementById('category').value = categories[0] || '';
             document.getElementById('icon').value = '';
             document.getElementById('name').value = '';
             document.getElementById('item').value = '';
@@ -187,6 +218,7 @@
             editingIndex = index;
             const model = models[index];
             document.getElementById('modalTitle').textContent = 'Редактировать модель';
+            populateCategorySelect();
             document.getElementById('category').value = model.category;
             document.getElementById('icon').value = model.icon;
             document.getElementById('name').value = model.name;
@@ -208,6 +240,11 @@
                 feature: document.getElementById('feature').value
             };
 
+            if (!model.name || !model.category) {
+                alert('Заполните название и выберите категорию!');
+                return;
+            }
+
             if (editingIndex === -1) {
                 models.push(model);
             } else {
@@ -216,7 +253,6 @@
 
             closeModal();
             renderModels();
-            alert('Модель сохранена! Не забудь нажать "Скачать models.json" и загрузить файл на GitHub.');
         }
 
         function deleteModel(index) {
@@ -226,22 +262,46 @@
             }
         }
 
-		function downloadModels() {
-			const data = {
-				categories: ["Аксессуары", "Элитры", "Булавы", "Мечи", "Кирки", "Лопаты", "Копья", "Щиты", "Тотемы", "Огнестрельное оружие", "Стрелы", "Шалкера", "Декор", "Стойки для брони", "Еда", "Зелья", "Книги", "Игры", "Прочее"],
-				models: models
-			};
-			const jsonStr = JSON.stringify(data, null, 2);
-			const blob = new Blob([jsonStr], { type: 'application/json' });
-			const url = URL.createObjectURL(blob);
-			const a = document.createElement('a');
-			a.href = url;
-			a.download = 'models.json';
-			a.click();
-			URL.revokeObjectURL(url);
-		}
+        // === КАТЕГОРИИ ===
+        function openAddCategoryModal() {
+            document.getElementById('newCategoryName').value = '';
+            document.getElementById('categoryModal').classList.add('active');
+        }
 
-        // Проверка входа при загрузке
+        function closeCategoryModal() {
+            document.getElementById('categoryModal').classList.remove('active');
+        }
+
+        function addCategory() {
+            const name = document.getElementById('newCategoryName').value.trim();
+            if (!name) {
+                alert('Введите название категории!');
+                return;
+            }
+            if (categories.includes(name)) {
+                alert('Такая категория уже существует!');
+                return;
+            }
+            categories.push(name);
+            closeCategoryModal();
+            renderModels();
+        }
+
+        function downloadModels() {
+            const data = {
+                categories: categories,
+                models: models
+            };
+            const jsonStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'models.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
         if (localStorage.getItem('adminLoggedIn') === 'true') {
             showAdminPanel();
         }
