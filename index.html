@@ -168,21 +168,28 @@
             }
         }
 
-        function renderSidebars() {
-            const sidebarContent = document.getElementById('sidebarContent');
-            const navContent = document.getElementById('navContent');
-            
-            sidebarContent.innerHTML = categories.map(cat => {
-                const id = cat.toLowerCase().replace(/\s+/g, '-');
-                const count = allModels.filter(m => m.category === cat).length;
-                return count > 0 ? `<li><a href="#${id}">${cat} (${count})</a></li>` : '';
-            }).join('');
+				function renderSidebars() {
+			const sidebarContent = document.getElementById('sidebarContent');
+			const navContent = document.getElementById('navContent');
+			
+			// Левая панель - Содержание
+			let leftHTML = '';
+			categories.forEach(cat => {
+				const count = allModels.filter(m => m.category === cat).length;
+				if (count > 0) {
+					const id = cat.toLowerCase().replace(/\s+/g, '-');
+					leftHTML += `<li><a href="#${id}">${cat}</a></li>`;
+				}
+			});
+			sidebarContent.innerHTML = leftHTML;
 
-            navContent.innerHTML = categories.map(cat => {
-                const id = cat.toLowerCase().replace(/\s+/g, '-');
-                return `<li><a href="#${id}">${cat}</a></li>`;
-            }).join('');
-        }
+			// Правая панель - Навигация
+			navContent.innerHTML = `
+				<li><a href="#аксессуары">️ Наверх</a></li>
+				<li><a href="https://github.com/MaximLapkin/SleepCraftResourcepack" target="_blank">📥 GitHub</a></li>
+				<li><a href="admin-panel.html">🔐 Админка</a></li>
+			`;
+		}
 
         // === ПРОВЕРКА АДМИНА ===
         const isAdmin = localStorage.getItem('adminLoggedIn') === 'true';
