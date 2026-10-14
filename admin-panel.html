@@ -226,16 +226,20 @@
             }
         }
 
-        function downloadModels() {
-            const data = JSON.stringify({ models: models }, null, 2);
-            const blob = new Blob([data], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'models.json';
-            a.click();
-            URL.revokeObjectURL(url);
-        }
+		function downloadModels() {
+			const data = {
+				categories: ["Аксессуары", "Элитры", "Булавы", "Мечи", "Кирки", "Лопаты", "Копья", "Щиты", "Тотемы", "Огнестрельное оружие", "Стрелы", "Шалкера", "Декор", "Стойки для брони", "Еда", "Зелья", "Книги", "Игры", "Прочее"],
+				models: models
+			};
+			const jsonStr = JSON.stringify(data, null, 2);
+			const blob = new Blob([jsonStr], { type: 'application/json' });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = 'models.json';
+			a.click();
+			URL.revokeObjectURL(url);
+		}
 
         // Проверка входа при загрузке
         if (localStorage.getItem('adminLoggedIn') === 'true') {
