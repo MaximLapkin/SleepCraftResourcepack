@@ -21,6 +21,8 @@
         .btn-download { background: #ffc107; color: #000; }
         .btn-logout { background: #ff4d4d; color: white; }
         .btn-add-cat { background: #6f42c1; color: white; }
+        .btn-add-link { background: #17a2b8; color: white; }
+        .section-title { color: #58a6ff; margin: 30px 0 15px 0; font-size: 1.5rem; border-bottom: 2px solid #444; padding-bottom: 10px; }
         .category-block { background: #2a2a2a; padding: 20px; border-radius: 12px; margin-bottom: 20px; cursor: grab; transition: background 0.2s; }
         .category-block:hover { background: #2f2f2f; }
         .category-block.dragging { opacity: 0.5; }
@@ -41,6 +43,13 @@
         .model-actions { display: flex; gap: 8px; }
         .btn-edit { background: #58a6ff; color: white; padding: 6px 12px; font-size: 0.85rem; }
         .btn-delete { background: #ff4d4d; color: white; padding: 6px 12px; font-size: 0.85rem; }
+        .link-item { background: #1a1a1a; padding: 12px 15px; margin: 8px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        .link-item:hover { background: #252525; }
+        .link-item.dragging { opacity: 0.5; }
+        .link-info { display: flex; align-items: center; flex: 1; gap: 10px; }
+        .link-icon { font-size: 1.5rem; }
+        .link-details strong { color: #e0e0e0; }
+        .link-details small { color: #888; display: block; margin-top: 3px; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
         .modal.active { display: flex; }
         .modal-content { background: #2a2a2a; padding: 30px; border-radius: 12px; width: 500px; max-width: 90%; max-height: 90vh; overflow-y: auto; }
@@ -67,13 +76,20 @@
             <div class="toolbar">
                 <button class="btn btn-add" onclick="openAddModal()">➕ Добавить модель</button>
                 <button class="btn btn-add-cat" onclick="openAddCategoryModal()">📁 Добавить категорию</button>
-                <button class="btn btn-download" onclick="downloadModels()">📥 Скачать models.json</button>
-                <button class="btn btn-logout" onclick="logout()">🚪 Выйти</button>
+                <button class="btn btn-add-link" onclick="openAddLinkModal()"> Добавить ссылку</button>
+                <button class="btn btn-download" onclick="downloadModels()"> Скачать models.json</button>
+                <button class="btn btn-logout" onclick="logout()"> Выйти</button>
             </div>
+
+            <h2 class="section-title">📂 Категории и модели</h2>
             <div id="categoriesList"></div>
+
+            <h2 class="section-title"> Ссылки (правая панель)</h2>
+            <div id="linksList"></div>
         </div>
     </div>
 
+    <!-- Модалка модели -->
     <div class="modal" id="modal">
         <div class="modal-content">
             <h3 id="modalTitle">Добавить модель</h3>
@@ -94,6 +110,7 @@
         </div>
     </div>
 
+    <!-- Модалка категории -->
     <div class="modal" id="categoryModal">
         <div class="modal-content">
             <h3>📁 Добавить новую категорию</h3>
@@ -106,11 +123,30 @@
         </div>
     </div>
 
+    <!-- Модалка ссылки -->
+    <div class="modal" id="linkModal">
+        <div class="modal-content">
+            <h3 id="linkModalTitle">Добавить ссылку</h3>
+            <label>Иконка (эмодзи):</label>
+            <input type="text" id="linkIcon" placeholder="⬆️">
+            <label>Название:</label>
+            <input type="text" id="linkTitle" placeholder="Наверх">
+            <label>URL:</label>
+            <input type="text" id="linkUrl" placeholder="#аксессуары или https://...">
+            <div class="modal-actions">
+                <button class="btn btn-save" onclick="saveLink()">💾 Сохранить</button>
+                <button class="btn btn-cancel" onclick="closeLinkModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
     <script src="users.js"></script>
     <script>
         let models = [];
         let categories = [];
+        let links = [];
         let editingIndex = -1;
+        let editingLinkIndex = -1;
 
         async function login() {
             const username = document.getElementById('username').value.trim();
@@ -150,12 +186,16 @@
                 const data = await response.json();
                 models = data.models || [];
                 categories = data.categories || [];
+                links = data.links || [];
                 renderModels();
+                renderLinks();
             } catch (error) {
                 console.error('Ошибка загрузки:', error);
                 models = [];
                 categories = [];
+                links = [];
                 renderModels();
+                renderLinks();
             }
         }
 
@@ -182,7 +222,7 @@
                     const realIndex = models.indexOf(model);
                     return `
                         <div class="model-item" data-index="${realIndex}">
-                            <span class="drag-handle" title="Перетащи">⋮⋮</span>
+                            <span class="drag-handle" title="Перетащи">⋮</span>
                             <div class="model-info">
                                 <img src="${model.icon}" alt="" onerror="this.style.display='none'">
                                 <div class="model-details">
@@ -212,7 +252,6 @@
                 block.appendChild(modelsContainer);
                 list.appendChild(block);
 
-                // Drag-and-drop для моделей
                 if (modelsInCat.length > 0) {
                     new Sortable(modelsContainer, {
                         handle: '.drag-handle',
@@ -231,7 +270,6 @@
                 }
             });
 
-            // Drag-and-drop для категорий
             new Sortable(list, {
                 handle: '.drag-handle-cat',
                 animation: 150,
@@ -240,6 +278,49 @@
                     const movedCategory = categories.splice(evt.oldIndex, 1)[0];
                     categories.splice(evt.newIndex, 0, movedCategory);
                     renderModels();
+                }
+            });
+        }
+
+        function renderLinks() {
+            const list = document.getElementById('linksList');
+            list.innerHTML = '';
+
+            if (links.length === 0) {
+                list.innerHTML = '<p style="color: #888;">Нет ссылок. Добавьте первую!</p>';
+                return;
+            }
+
+            const linksContainer = document.createElement('div');
+            linksContainer.className = 'links-container';
+
+            linksContainer.innerHTML = links.map((link, idx) => `
+                <div class="link-item" data-index="${idx}">
+                    <span class="drag-handle" title="Перетащи">⋮⋮</span>
+                    <div class="link-info">
+                        <span class="link-icon">${link.icon || '🔗'}</span>
+                        <div class="link-details">
+                            <strong>${link.title}</strong>
+                            <small>${link.url}</small>
+                        </div>
+                    </div>
+                    <div class="model-actions">
+                        <button class="btn btn-edit" onclick="editLink(${idx})">✏️</button>
+                        <button class="btn btn-delete" onclick="deleteLink(${idx})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+
+            list.appendChild(linksContainer);
+
+            new Sortable(linksContainer, {
+                handle: '.drag-handle',
+                animation: 150,
+                ghostClass: 'dragging',
+                onEnd: function(evt) {
+                    const movedLink = links.splice(evt.oldIndex, 1)[0];
+                    links.splice(evt.newIndex, 0, movedLink);
+                    renderLinks();
                 }
             });
         }
@@ -333,10 +414,64 @@
             renderModels();
         }
 
+        // === ССЫЛКИ ===
+        function openAddLinkModal() {
+            editingLinkIndex = -1;
+            document.getElementById('linkModalTitle').textContent = 'Добавить ссылку';
+            document.getElementById('linkIcon').value = '🔗';
+            document.getElementById('linkTitle').value = '';
+            document.getElementById('linkUrl').value = '';
+            document.getElementById('linkModal').classList.add('active');
+        }
+
+        function editLink(index) {
+            editingLinkIndex = index;
+            const link = links[index];
+            document.getElementById('linkModalTitle').textContent = 'Редактировать ссылку';
+            document.getElementById('linkIcon').value = link.icon || '🔗';
+            document.getElementById('linkTitle').value = link.title;
+            document.getElementById('linkUrl').value = link.url;
+            document.getElementById('linkModal').classList.add('active');
+        }
+
+        function closeLinkModal() {
+            document.getElementById('linkModal').classList.remove('active');
+        }
+
+        function saveLink() {
+            const link = {
+                icon: document.getElementById('linkIcon').value || '🔗',
+                title: document.getElementById('linkTitle').value,
+                url: document.getElementById('linkUrl').value
+            };
+
+            if (!link.title || !link.url) {
+                alert('Заполните название и URL!');
+                return;
+            }
+
+            if (editingLinkIndex === -1) {
+                links.push(link);
+            } else {
+                links[editingLinkIndex] = link;
+            }
+
+            closeLinkModal();
+            renderLinks();
+        }
+
+        function deleteLink(index) {
+            if (confirm('Удалить ссылку "' + links[index].title + '"?')) {
+                links.splice(index, 1);
+                renderLinks();
+            }
+        }
+
         function downloadModels() {
             const data = {
                 categories: categories,
-                models: models
+                models: models,
+                links: links
             };
             const jsonStr = JSON.stringify(data, null, 2);
             const blob = new Blob([jsonStr], { type: 'application/json' });

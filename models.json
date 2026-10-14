@@ -1106,5 +1106,10 @@
       "item": "Заряд ветра/Сердце моря",
       "feature": "Анимированная текстура. Изменяется при зажатии пкм"
     }
+  ],
+	"links": [
+		{"title": "Наверх", "url": "#аксессуары", "icon": "⬆️"},
+		{"title": "GitHub", "url": "https://github.com/MaximLapkin/SleepCraftResourcepack", "icon": "📥"},
+		{"title": "Админка", "url": "admin-panel.html", "icon": "🔐"}
   ]
 }
