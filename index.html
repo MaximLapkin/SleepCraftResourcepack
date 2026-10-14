@@ -99,9 +99,9 @@
     <script src="users.js"></script>
     <script>
         // === ЗАГРУЗКА МОДЕЛЕЙ ИЗ models.json ===
-        let allModels = [];
+		let allModels = [];
+		let categories = [];
 		let links = [];
-        const categories = ["Аксессуары", "Элитры", "Булавы", "Мечи", "Кирки", "Лопаты", "Копья", "Щиты", "Тотемы", "Огнестрельное оружие", "Стрелы", "Шалкера", "Декор", "Стойки для брони", "Еда", "Зелья", "Книги", "Игры", "Прочее"];
 
 		async function loadModels() {
 			try {
@@ -109,7 +109,7 @@
 				const data = await response.json();
 				allModels = data.models || [];
 				categories = data.categories || [];
-				links = data.links || [];  // Добавь эту строку
+				links = data.links || [];
 				renderModels();
 				renderSidebars();
 			} catch (error) {
@@ -117,7 +117,6 @@
 				document.getElementById('modelsContainer').innerHTML = '<p style="color: #ff4d4d;">Ошибка загрузки моделей. Проверьте файл models.json.</p>';
 			}
 		}
-
         function renderModels() {
             const container = document.getElementById('modelsContainer');
             container.innerHTML = '';
