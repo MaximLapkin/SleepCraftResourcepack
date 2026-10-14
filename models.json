@@ -1107,9 +1107,31 @@
       "feature": "Анимированная текстура. Изменяется при зажатии пкм"
     }
   ],
-	"links": [
-		{"title": "Наверх", "url": "#аксессуары", "icon": "⬆️"},
-		{"title": "GitHub", "url": "https://github.com/MaximLapkin/SleepCraftResourcepack", "icon": "📥"},
-		{"title": "Админка", "url": "admin-panel.html", "icon": "🔐"}
+  "links": [
+    {
+      "icon": "⬇️",
+      "title": "Скачать РП",
+      "url": "download.html"
+    },
+    {
+      "icon": "🌐",
+      "title": "Главная СКРП",
+      "url": "index.html"
+    },
+    {
+      "icon": "🗨️",
+      "title": "Телеграм канал",
+      "url": "https://t.me/SCRPNews"
+    },
+    {
+      "icon": "🗨️",
+      "title": "Дискорд SleepCraft",
+      "url": "https://discord.gg/VH3EFQGYZF"
+    },
+    {
+      "icon": "💎",
+      "title": "Донат",
+      "url": "#"
+    }
   ]
 }
