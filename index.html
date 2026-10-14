@@ -215,25 +215,36 @@
 			`;
 		}
 
-        // === ПРОВЕРКА АДМИНА ===
-        const isAdmin = localStorage.getItem('adminLoggedIn') === 'true';
-        const loginBtn = document.getElementById('loginBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
+		// === ПРОВЕРКА АДМИНА ===
+		const urlParams = new URLSearchParams(window.location.search);
+		if (urlParams.get('logout') === 'true') {
+			localStorage.removeItem('adminLoggedIn');
+			localStorage.removeItem('adminUser');
+			window.history.replaceState({}, document.title, window.location.pathname);
+		}
 
-        if (isAdmin) {
-            console.log("Режим администратора активирован:", localStorage.getItem('adminUser'));
-            if (loginBtn) loginBtn.style.display = 'none';
-            if (logoutBtn) logoutBtn.style.display = 'block';
-            document.body.classList.add('admin-mode');
-        }
+		const isAdmin = localStorage.getItem('adminLoggedIn') === 'true';
+		const loginBtn = document.getElementById('loginBtn');
+		const logoutBtn = document.getElementById('logoutBtn');
 
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', () => {
-                localStorage.removeItem('adminLoggedIn');
-                localStorage.removeItem('adminUser');
-                window.location.reload();
-            });
-        }
+		if (isAdmin) {
+			console.log("Режим администратора активирован:", localStorage.getItem('adminUser'));
+			if (loginBtn) loginBtn.style.display = 'none';
+			if (logoutBtn) logoutBtn.style.display = 'block';
+			document.body.classList.add('admin-mode');
+		} else {
+			if (loginBtn) loginBtn.style.display = 'block';
+			if (logoutBtn) logoutBtn.style.display = 'none';
+			document.body.classList.remove('admin-mode');
+		}
+
+		if (logoutBtn) {
+			logoutBtn.addEventListener('click', () => {
+				localStorage.removeItem('adminLoggedIn');
+				localStorage.removeItem('adminUser');
+				window.location.href = 'index.html?logout=true';
+			});
+		}
 
         // === МОДАЛЬНОЕ ОКНО ===
         let currentCategory = '';

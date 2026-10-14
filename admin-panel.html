@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Админ-панель СКРП</title>
-    <!-- Подключаем SortableJS для drag-and-drop -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -22,8 +21,13 @@
         .btn-download { background: #ffc107; color: #000; }
         .btn-logout { background: #ff4d4d; color: white; }
         .btn-add-cat { background: #6f42c1; color: white; }
-        .category-block { background: #2a2a2a; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
-        .category-block h2 { color: #58a6ff; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        .category-block { background: #2a2a2a; padding: 20px; border-radius: 12px; margin-bottom: 20px; cursor: grab; transition: background 0.2s; }
+        .category-block:hover { background: #2f2f2f; }
+        .category-block.dragging { opacity: 0.5; }
+        .category-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        .category-header h2 { color: #58a6ff; margin: 0; flex: 1; }
+        .drag-handle-cat { font-size: 1.5rem; color: #666; cursor: grab; user-select: none; padding: 5px; }
+        .drag-handle-cat:hover { color: #58a6ff; }
         .model-item { background: #1a1a1a; padding: 12px 15px; margin: 8px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: grab; transition: background 0.2s; }
         .model-item:hover { background: #252525; }
         .model-item.dragging { opacity: 0.5; background: #333; }
@@ -51,7 +55,7 @@
 <body>
     <div class="container">
         <div class="login-box" id="loginBox">
-            <h2>🔐 Вход в админ-панель</h2>
+            <h2> Вход в админ-панель</h2>
             <input type="text" id="username" placeholder="Логин">
             <input type="password" id="password" placeholder="Пароль">
             <button onclick="login()">Войти</button>
@@ -62,15 +66,14 @@
             <h1>🛠️ Админ-панель СКРП</h1>
             <div class="toolbar">
                 <button class="btn btn-add" onclick="openAddModal()">➕ Добавить модель</button>
-                <button class="btn btn-add-cat" onclick="openAddCategoryModal()"> Добавить категорию</button>
-                <button class="btn btn-download" onclick="downloadModels()"> Скачать models.json</button>
-                <button class="btn btn-logout" onclick="logout()"> Выйти</button>
+                <button class="btn btn-add-cat" onclick="openAddCategoryModal()">📁 Добавить категорию</button>
+                <button class="btn btn-download" onclick="downloadModels()">📥 Скачать models.json</button>
+                <button class="btn btn-logout" onclick="logout()">🚪 Выйти</button>
             </div>
-            <div id="modelList"></div>
+            <div id="categoriesList"></div>
         </div>
     </div>
 
-    <!-- Модалка модели -->
     <div class="modal" id="modal">
         <div class="modal-content">
             <h3 id="modalTitle">Добавить модель</h3>
@@ -91,7 +94,6 @@
         </div>
     </div>
 
-    <!-- Модалка категории -->
     <div class="modal" id="categoryModal">
         <div class="modal-content">
             <h3>📁 Добавить новую категорию</h3>
@@ -133,7 +135,7 @@
         function logout() {
             localStorage.removeItem('adminLoggedIn');
             localStorage.removeItem('adminUser');
-            location.reload();
+            window.location.href = 'index.html?logout=true';
         }
 
         async function showAdminPanel() {
@@ -158,7 +160,7 @@
         }
 
         function renderModels() {
-            const list = document.getElementById('modelList');
+            const list = document.getElementById('categoriesList');
             list.innerHTML = '';
 
             if (categories.length === 0) {
@@ -171,16 +173,16 @@
                 
                 const block = document.createElement('div');
                 block.className = 'category-block';
+                block.dataset.category = category;
                 
                 const modelsContainer = document.createElement('div');
                 modelsContainer.className = 'models-container';
-                modelsContainer.dataset.category = category;
 
-                let modelsHTML = modelsInCat.map((model, idx) => {
+                let modelsHTML = modelsInCat.map((model) => {
                     const realIndex = models.indexOf(model);
                     return `
                         <div class="model-item" data-index="${realIndex}">
-                            <span class="drag-handle" title="Перетащи для изменения порядка">⋮⋮</span>
+                            <span class="drag-handle" title="Перетащи">⋮⋮</span>
                             <div class="model-info">
                                 <img src="${model.icon}" alt="" onerror="this.style.display='none'">
                                 <div class="model-details">
@@ -190,7 +192,7 @@
                             </div>
                             <div class="model-actions">
                                 <button class="btn btn-edit" onclick="editModel(${realIndex})">✏️</button>
-                                <button class="btn btn-delete" onclick="deleteModel(${realIndex})">🗑️</button>
+                                <button class="btn btn-delete" onclick="deleteModel(${realIndex})">️</button>
                             </div>
                         </div>
                     `;
@@ -201,30 +203,43 @@
                 }
 
                 modelsContainer.innerHTML = modelsHTML;
-                block.innerHTML = `<h2>${category} (${modelsInCat.length})</h2>`;
+                block.innerHTML = `
+                    <div class="category-header">
+                        <span class="drag-handle-cat" title="Перетащи категорию">⋮⋮</span>
+                        <h2>${category} (${modelsInCat.length})</h2>
+                    </div>
+                `;
                 block.appendChild(modelsContainer);
                 list.appendChild(block);
 
-                // Инициализируем drag-and-drop для каждой категории
+                // Drag-and-drop для моделей
                 if (modelsInCat.length > 0) {
                     new Sortable(modelsContainer, {
                         handle: '.drag-handle',
                         animation: 150,
                         ghostClass: 'dragging',
                         onEnd: function(evt) {
-                            // Перемещаем модель в массиве models
                             const oldIndex = parseInt(evt.item.dataset.index);
                             const newIndex = evt.newIndex;
                             const movedModel = models.splice(oldIndex, 1)[0];
-                            
-                            // Находим правильную позицию в общем массиве
                             const categoryModels = models.filter(m => m.category === category);
                             const categoryStartIndex = models.indexOf(categoryModels[0]);
-                            
                             models.splice(categoryStartIndex + newIndex, 0, movedModel);
                             renderModels();
                         }
                     });
+                }
+            });
+
+            // Drag-and-drop для категорий
+            new Sortable(list, {
+                handle: '.drag-handle-cat',
+                animation: 150,
+                ghostClass: 'dragging',
+                onEnd: function(evt) {
+                    const movedCategory = categories.splice(evt.oldIndex, 1)[0];
+                    categories.splice(evt.newIndex, 0, movedCategory);
+                    renderModels();
                 }
             });
         }
