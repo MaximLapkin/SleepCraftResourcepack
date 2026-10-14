@@ -23,15 +23,15 @@
   "models": [
     {
       "category": "Аксессуары",
-      "icon": "images/catears.png",
-      "name": "Кошачьи ушки",
+      "icon": "images/foxears.png",
+      "name": "Лисьи ушки",
       "item": "Вырезанная тыква",
       "feature": ""
     },
     {
       "category": "Аксессуары",
-      "icon": "images/foxears.png",
-      "name": "Лисьи ушки",
+      "icon": "images/catears.png",
+      "name": "Кошачьи ушки",
       "item": "Вырезанная тыква",
       "feature": ""
     },
