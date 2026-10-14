@@ -168,24 +168,48 @@
             }
         }
 
-				function renderSidebars() {
+		function renderSidebars() {
 			const sidebarContent = document.getElementById('sidebarContent');
 			const navContent = document.getElementById('navContent');
 			
-			// Левая панель - Содержание
+			// Эмодзи для категорий
+			const emojis = {
+				'Аксессуары': '🎭',
+				'Элитры': '🦋',
+				'Булавы': '🔨',
+				'Мечи': '⚔️',
+				'Кирки': '⛏️',
+				'Лопаты': '🪣',
+				'Копья': '🔱',
+				'Щиты': '🛡️',
+				'Тотемы': '',
+				'Огнестрельное оружие': '🔫',
+				'Стрелы': '🏹',
+				'Шалкера': '📦',
+				'Декор': '🎨',
+				'Стойки для брони': '👤',
+				'Еда': '🍔',
+				'Зелья': '🧪',
+				'Книги': '📚',
+				'Игры': '🎲',
+				'Прочее': '📌'
+			};
+			
+			// Левая панель - Содержание (с эмодзи)
 			let leftHTML = '';
 			categories.forEach(cat => {
 				const count = allModels.filter(m => m.category === cat).length;
 				if (count > 0) {
 					const id = cat.toLowerCase().replace(/\s+/g, '-');
-					leftHTML += `<li><a href="#${id}">${cat}</a></li>`;
+					const emoji = emojis[cat] || '📄';
+					leftHTML += `<li><a href="#${id}">${emoji} ${cat}</a></li>`;
 				}
 			});
 			sidebarContent.innerHTML = leftHTML;
 
 			// Правая панель - Навигация
 			navContent.innerHTML = `
-				<li><a href="#аксессуары">️ Наверх</a></li>
+				<li><a href="#аксессуары">⬆️ Наверх</a></li>
 				<li><a href="https://github.com/MaximLapkin/SleepCraftResourcepack" target="_blank">📥 GitHub</a></li>
 				<li><a href="admin-panel.html">🔐 Админка</a></li>
 			`;
