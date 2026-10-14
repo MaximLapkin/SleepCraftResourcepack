@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Админ-панель СКРП</title>
+    <!-- Подключаем SortableJS для drag-and-drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #1a1a1a; color: #e0e0e0; padding: 20px; }
@@ -22,12 +24,16 @@
         .btn-add-cat { background: #6f42c1; color: white; }
         .category-block { background: #2a2a2a; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
         .category-block h2 { color: #58a6ff; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px; }
-        .model-item { background: #1a1a1a; padding: 12px 15px; margin: 8px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .model-item { background: #1a1a1a; padding: 12px 15px; margin: 8px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: grab; transition: background 0.2s; }
+        .model-item:hover { background: #252525; }
+        .model-item.dragging { opacity: 0.5; background: #333; }
         .model-item img { width: 40px; height: 40px; object-fit: contain; margin-right: 15px; }
         .model-info { display: flex; align-items: center; flex: 1; }
         .model-details { flex: 1; }
         .model-details strong { color: #e0e0e0; }
         .model-details small { color: #888; display: block; margin-top: 3px; }
+        .drag-handle { font-size: 1.5rem; color: #666; cursor: grab; margin-right: 15px; user-select: none; padding: 5px; }
+        .drag-handle:hover { color: #58a6ff; }
         .model-actions { display: flex; gap: 8px; }
         .btn-edit { background: #58a6ff; color: white; padding: 6px 12px; font-size: 0.85rem; }
         .btn-delete { background: #ff4d4d; color: white; padding: 6px 12px; font-size: 0.85rem; }
@@ -45,7 +51,7 @@
 <body>
     <div class="container">
         <div class="login-box" id="loginBox">
-            <h2> Вход в админ-панель</h2>
+            <h2>🔐 Вход в админ-панель</h2>
             <input type="text" id="username" placeholder="Логин">
             <input type="password" id="password" placeholder="Пароль">
             <button onclick="login()">Войти</button>
@@ -56,9 +62,9 @@
             <h1>🛠️ Админ-панель СКРП</h1>
             <div class="toolbar">
                 <button class="btn btn-add" onclick="openAddModal()">➕ Добавить модель</button>
-                <button class="btn btn-add-cat" onclick="openAddCategoryModal()">📁 Добавить категорию</button>
-                <button class="btn btn-download" onclick="downloadModels()">📥 Скачать models.json</button>
-                <button class="btn btn-logout" onclick="logout()">🚪 Выйти</button>
+                <button class="btn btn-add-cat" onclick="openAddCategoryModal()"> Добавить категорию</button>
+                <button class="btn btn-download" onclick="downloadModels()"> Скачать models.json</button>
+                <button class="btn btn-logout" onclick="logout()"> Выйти</button>
             </div>
             <div id="modelList"></div>
         </div>
@@ -166,10 +172,15 @@
                 const block = document.createElement('div');
                 block.className = 'category-block';
                 
+                const modelsContainer = document.createElement('div');
+                modelsContainer.className = 'models-container';
+                modelsContainer.dataset.category = category;
+
                 let modelsHTML = modelsInCat.map((model, idx) => {
                     const realIndex = models.indexOf(model);
                     return `
-                        <div class="model-item">
+                        <div class="model-item" data-index="${realIndex}">
+                            <span class="drag-handle" title="Перетащи для изменения порядка">⋮⋮</span>
                             <div class="model-info">
                                 <img src="${model.icon}" alt="" onerror="this.style.display='none'">
                                 <div class="model-details">
@@ -189,11 +200,32 @@
                     modelsHTML = '<p style="color: #666; font-style: italic;">Нет моделей в этой категории</p>';
                 }
 
-                block.innerHTML = `
-                    <h2>${category} (${modelsInCat.length})</h2>
-                    ${modelsHTML}
-                `;
+                modelsContainer.innerHTML = modelsHTML;
+                block.innerHTML = `<h2>${category} (${modelsInCat.length})</h2>`;
+                block.appendChild(modelsContainer);
                 list.appendChild(block);
+
+                // Инициализируем drag-and-drop для каждой категории
+                if (modelsInCat.length > 0) {
+                    new Sortable(modelsContainer, {
+                        handle: '.drag-handle',
+                        animation: 150,
+                        ghostClass: 'dragging',
+                        onEnd: function(evt) {
+                            // Перемещаем модель в массиве models
+                            const oldIndex = parseInt(evt.item.dataset.index);
+                            const newIndex = evt.newIndex;
+                            const movedModel = models.splice(oldIndex, 1)[0];
+                            
+                            // Находим правильную позицию в общем массиве
+                            const categoryModels = models.filter(m => m.category === category);
+                            const categoryStartIndex = models.indexOf(categoryModels[0]);
+                            
+                            models.splice(categoryStartIndex + newIndex, 0, movedModel);
+                            renderModels();
+                        }
+                    });
+                }
             });
         }
 
@@ -262,7 +294,6 @@
             }
         }
 
-        // === КАТЕГОРИИ ===
         function openAddCategoryModal() {
             document.getElementById('newCategoryName').value = '';
             document.getElementById('categoryModal').classList.add('active');
