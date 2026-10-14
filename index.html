@@ -11,23 +11,61 @@
 
     <!-- Кнопки входа/выхода -->
     <button id="loginBtn" class="admin-entry-btn" onclick="location.href='login.html'">🔐 Панель</button>
-    <button id="logoutBtn" class="admin-entry-btn" style="display: none; background: #ff4d4d; border-color: #ff4d4d; color: white;"> Выйти</button>
+    <button id="logoutBtn" class="admin-entry-btn" style="display: none; background: #ff4d4d; border-color: #ff4d4d; color: white;">🚪 Выйти</button>
 
-    <!-- Сайдбары -->
-    <div class="sidebar left-sidebar">
-        <div class="tab"> Содержание</div>
-        <div class="content" id="sidebarContent"></div>
+    <!-- Сайдбары (правильная структура под твой CSS) -->
+    <div class="sidebar-wrapper left">
+        <div class="sidebar">
+            <div class="tab">Содержание</div>
+            <div class="sidebar-content">
+                <div class="sidebar-inner">
+                    <h3>Категории</h3>
+                    <ul id="sidebarContent"></ul>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="sidebar right-sidebar">
-        <div class="tab"> Навигация</div>
-        <div class="content" id="navContent"></div>
+    <div class="sidebar-wrapper right">
+        <div class="sidebar">
+            <div class="tab">Навигация</div>
+            <div class="sidebar-content">
+                <div class="sidebar-inner">
+                    <h3>Ссылки</h3>
+                    <ul id="navContent"></ul>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Основной контент -->
     <main>
-        <h1>SleepCraft Resource Pack</h1>
-        <p class="subtitle">Коллекция уникальных моделей для Minecraft</p>
-        
+        <header>
+            <div class="logo-container">СКРП</div>
+        </header>
+
+        <p class="about-text"><strong>О СКРП:</strong> Добро пожаловать в базу данных ресурспака! Здесь собрана вся информация о кастомных предметах, механиках и переименованиях.</p>
+
+        <div class="alert-block">
+            <h3>ВАЖНОЕ УВЕДОМЛЕНИЕ!</h3>
+            <p style="background: #ff4d4d; color: white; padding: 5px 10px; border-radius: 4px; display: inline-block; font-weight: bold;">МОДЕЛИ НЕ РАБОТАЮТ ЧЕРЕЗ /rensmeitem!</p>
+            <ul class="alert-list">
+                <li>Внимание! Ресурспак находится в стадии активного тестирования</li>
+                <li>Некоторые модели могут отображаться некорректно</li>
+                <li>На сайте присутствует пасхалка!</li>
+            </ul>
+        </div>
+
+        <div class="updates-block">
+            <h3>Последние обновления</h3>
+            <ul class="updates-list">
+                <li>Добавлены новые предметы;</li>
+                <li>Обновлены текстуры для предметов;</li>
+                <li>Обновлён сайт, добавлены новые предметы:</li>
+                <li>Мечи, Копья, Щиты, Тотемы, Шалкера, Зелья и Книги</li>
+                <li>Добавлена музыка справа - сверху сайта</li>
+            </ul>
+        </div>
+
         <!-- Сюда JavaScript автоматически вставит все категории -->
         <div id="modelsContainer"></div>
     </main>
@@ -40,7 +78,7 @@
             <div class="controls">
                 <button class="ctrl-btn" id="prevBtn">⏮</button>
                 <button class="ctrl-btn play-pause" id="playPauseBtn">▶</button>
-                <button class="ctrl-btn" id="nextBtn">⏭</button>
+                <button class="ctrl-btn" id="nextBtn"></button>
             </div>
             <div class="volume-control">
                 <span>🔊</span>
@@ -53,31 +91,10 @@
     <audio id="mainAudio"></audio>
 
     <!-- Секретка -->
-    <div id="secretOverlay" class="hidden">
+    <div id="secretOverlay" class="fullscreen-overlay hidden">
         <div id="creepyText" class="creepy-text"></div>
     </div>
     <audio id="secretMusic" src="music/secret.mp3" loop></audio>
-
-    <!-- Модальное окно админки -->
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal-box">
-            <h3>➕ Добавить в: <span id="modalCategoryTitle">Категория</span></h3>
-            <label>Изображение (путь):</label>
-            <input type="text" id="formImage" placeholder="images/example.png">
-            <label>Переименование:</label>
-            <input type="text" id="formName" placeholder="Название">
-            <label>Предмет:</label>
-            <input type="text" id="formItem" placeholder="Предмет">
-            <label>Особенность:</label>
-            <textarea id="formFeature" rows="3" placeholder="Описание"></textarea>
-            <div class="modal-actions">
-                <button class="btn-generate" onclick="generateCode()">Сгенерировать код</button>
-                <button class="btn-close" onclick="closeModal()">Закрыть</button>
-            </div>
-            <div class="result-box" id="resultBox"></div>
-            <button class="btn-copy" id="btnCopy" onclick="copyCode()">📋 Скопировать</button>
-        </div>
-    </div>
 
     <script src="users.js"></script>
     <script>
@@ -158,12 +175,12 @@
             sidebarContent.innerHTML = categories.map(cat => {
                 const id = cat.toLowerCase().replace(/\s+/g, '-');
                 const count = allModels.filter(m => m.category === cat).length;
-                return count > 0 ? `<a href="#${id}">${cat} (${count})</a>` : '';
+                return count > 0 ? `<li><a href="#${id}">${cat} (${count})</a></li>` : '';
             }).join('');
 
             navContent.innerHTML = categories.map(cat => {
                 const id = cat.toLowerCase().replace(/\s+/g, '-');
-                return `<a href="#${id}">${cat}</a>`;
+                return `<li><a href="#${id}">${cat}</a></li>`;
             }).join('');
         }
 
@@ -192,41 +209,19 @@
 
         function openAddModal(category) {
             currentCategory = category;
-            document.getElementById('modalCategoryTitle').textContent = category;
-            document.getElementById('modalOverlay').classList.add('active');
-            document.getElementById('formImage').value = '';
-            document.getElementById('formName').value = '';
-            document.getElementById('formItem').value = '';
-            document.getElementById('formFeature').value = '';
-            document.getElementById('resultBox').style.display = 'none';
-            document.getElementById('btnCopy').style.display = 'none';
+            alert('Открой admin-panel.html для добавления моделей');
         }
 
         function closeModal() {
-            document.getElementById('modalOverlay').classList.remove('active');
+            // Не используется
         }
 
         function generateCode() {
-            const icon = document.getElementById('formImage').value || 'images/new.png';
-            const name = document.getElementById('formName').value || 'Новый предмет';
-            const item = document.getElementById('formItem').value || 'Предмет';
-            const feature = document.getElementById('formFeature').value || '';
-
-            const htmlCode = `{"category": "${currentCategory}", "icon": "${icon}", "name": "${name}", "item": "${item}", "feature": "${feature}"}`;
-            
-            const resultBox = document.getElementById('resultBox');
-            resultBox.textContent = htmlCode;
-            resultBox.style.display = 'block';
-            document.getElementById('btnCopy').style.display = 'block';
+            // Не используется
         }
 
         function copyCode() {
-            const code = document.getElementById('resultBox').textContent;
-            navigator.clipboard.writeText(code).then(() => {
-                const btn = document.getElementById('btnCopy');
-                btn.textContent = '✅ Скопировано! Добавь в models.json';
-                setTimeout(() => btn.textContent = '📋 Скопировать', 2000);
-            });
+            // Не используется
         }
 
         // === ПЛЕЕР ===
@@ -355,7 +350,7 @@
         }
 
         function startMinecraftGlitch(element) {
-            const alienChars = "ࢭࣨݺࣱࣚᶎᵓᵍᶊᶷḀϯ҉҈Ғ࣯ࣳᴇ࣬ࣔࢯ";
+            const alienChars = "ࢭࣨݺࣱࣚᶎᵍᶊᶷḀϯ҉҈Ғࣳᴇ࣬ࢯ";
             element.className = "creepy-text glitch-active fade-in";
             setInterval(() => {
                 let randomText = "";
