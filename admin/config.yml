@@ -14,6 +14,7 @@ collections:
       - label: "Список всех моделей"
         name: "models"
         widget: "list"
+        summary: "{{fields.name}} ({{fields.category}})"
         fields:
           - { label: "Категория", name: "category", widget: "select", options: ["Аксессуары", "Элитры", "Булавы", "Мечи", "Кирки", "Лопаты", "Копья", "Щиты", "Тотемы", "Огнестрельное оружие", "Стрелы", "Шалкера", "Декор", "Стойки для брони", "Еда", "Зелья", "Книги", "Игры", "Прочее"] }
           - { label: "Иконка (загрузи файл)", name: "icon", widget: "image" }
