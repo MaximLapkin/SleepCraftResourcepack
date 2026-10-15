@@ -2,79 +2,79 @@
   "categories": [
     {
       "name": "Аксессуары",
-      "emoji": "📄"
+      "emoji": "🎀"
     },
     {
       "name": "Элитры",
-      "emoji": "📄"
+      "emoji": "🪽"
     },
     {
       "name": "Булавы",
-      "emoji": "📄"
+      "emoji": "🪨"
     },
     {
       "name": "Мечи",
-      "emoji": "📄"
+      "emoji": "⚔️"
     },
     {
       "name": "Кирки",
-      "emoji": "📄"
+      "emoji": "⛏️"
     },
     {
       "name": "Лопаты",
-      "emoji": "📄"
+      "emoji": "⚒️"
     },
     {
       "name": "Копья",
-      "emoji": "📄"
+      "emoji": "🗡️"
     },
     {
       "name": "Щиты",
-      "emoji": "📄"
+      "emoji": "🛡️"
     },
     {
       "name": "Тотемы",
-      "emoji": "📄"
+      "emoji": "💊️"
     },
     {
       "name": "Огнестрельное оружие",
-      "emoji": "📄"
+      "emoji": "🔫"
     },
     {
       "name": "Стрелы",
-      "emoji": "📄"
+      "emoji": "🏹"
     },
     {
       "name": "Шалкера",
-      "emoji": "📄"
+      "emoji": "🧳"
     },
     {
       "name": "Декор",
-      "emoji": "📄"
+      "emoji": "🖼️"
     },
     {
       "name": "Стойки для брони",
-      "emoji": "📄"
+      "emoji": "👤"
     },
     {
       "name": "Еда",
-      "emoji": "📄"
+      "emoji": "🍕"
     },
     {
       "name": "Зелья",
-      "emoji": "📄"
+      "emoji": "🥛"
     },
     {
       "name": "Книги",
-      "emoji": "📄"
+      "emoji": "📕"
     },
     {
       "name": "Игры",
-      "emoji": "📄"
+      "emoji": "🃏"
     },
     {
       "name": "Прочее",
-      "emoji": "📄"
+      "emoji": "📌"
     }
   ],
   "models": [
