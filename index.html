@@ -117,85 +117,81 @@
 				document.getElementById('modelsContainer').innerHTML = '<p style="color: #ff4d4d;">Ошибка загрузки моделей. Проверьте файл models.json.</p>';
 			}
 		}
-        function renderModels() {
-            const container = document.getElementById('modelsContainer');
-            container.innerHTML = '';
+		function renderModels() {
+			const container = document.getElementById('modelsContainer');
+			container.innerHTML = '';
 
-            categories.forEach(category => {
-                const modelsInCategory = allModels.filter(m => m.category === category);
-                if (modelsInCategory.length === 0) return;
+			categories.forEach(catObj => {
+				const catName = catObj.name;
+				// Фильтруем модели по имени категории
+				const modelsInCategory = allModels.filter(m => m.category === catName);
+				if (modelsInCategory.length === 0) return;
 
-                const section = document.createElement('section');
-                section.id = category.toLowerCase().replace(/\s+/g, '-');
-                section.innerHTML = `
-                    <h2>${category}</h2>
-                    <div class="table-wrapper">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th width="80">Иконка</th>
-                                    <th>Переименование</th>
-                                    <th>Предмет</th>
-                                    <th>Особенность</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${modelsInCategory.map(model => `
-                                    <tr>
-                                        <td><img src="${model.icon}" alt="" class="item-icon"></td>
-                                        <td>${model.name}</td>
-                                        <td>${model.item}</td>
-                                        <td>${model.feature ? model.feature.replace(/\n/g, '<br>') : ''}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-                container.appendChild(section);
-            });
+				const section = document.createElement('section');
+				section.id = catName.toLowerCase().replace(/\s+/g, '-');
+				section.innerHTML = `
+					<h2>${catName}</h2>
+					<div class="table-wrapper">
+						<table>
+							<thead>
+								<tr>
+									<th width="80">Иконка</th>
+									<th>Переименование</th>
+									<th>Предмет</th>
+									<th>Особенность</th>
+								</tr>
+							</thead>
+							<tbody>
+								${modelsInCategory.map(model => `
+									<tr>
+										<td><img src="${model.icon}" alt="" class="item-icon"></td>
+										<td>${model.name}</td>
+										<td>${model.item}</td>
+										<td>${model.feature ? model.feature.replace(/\n/g, '<br>') : ''}</td>
+									</tr>
+								`).join('')}
+							</tbody>
+						</table>
+					</div>
+				`;
+				container.appendChild(section);
+			});
 
-            // Добавляем админ-кнопки если вошёл
-            if (localStorage.getItem('adminLoggedIn') === 'true') {
-                document.querySelectorAll('section').forEach(section => {
-                    const titleEl = section.querySelector('h2');
-                    const categoryName = titleEl ? titleEl.textContent.trim() : 'Категория';
-                    const btn = document.createElement('button');
-                    btn.className = 'admin-add-btn';
-                    btn.textContent = '➕ Добавить в ' + categoryName;
-                    btn.onclick = () => openAddModal(categoryName);
-                    btn.style.cssText = 'background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 10px; display: inline-block;';
-                    section.insertBefore(btn, section.firstChild);
-                });
-            }
-        }
+			// Добавляем админ-кнопки если вошёл
+			if (localStorage.getItem('adminLoggedIn') === 'true') {
+				document.querySelectorAll('section').forEach(section => {
+					const titleEl = section.querySelector('h2');
+					const categoryName = titleEl ? titleEl.textContent.trim() : 'Категория';
+					const btn = document.createElement('button');
+					btn.className = 'admin-add-btn';
+					btn.textContent = '➕ Добавить в ' + categoryName;
+					btn.onclick = () => {
+						alert('Для добавления моделей используйте админ-панель: admin-panel.html');
+					};
+					btn.style.cssText = 'background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 10px; display: inline-block;';
+					section.insertBefore(btn, section.firstChild);
+				});
+			}
+		}
 
 		function renderSidebars() {
 			const sidebarContent = document.getElementById('sidebarContent');
 			const navContent = document.getElementById('navContent');
 			
-			// Эмодзи для категорий
-			const emojis = {
-				'Аксессуары': '', 'Элитры': '🦋', 'Булавы': '🔨', 'Мечи': '⚔️',
-				'Кирки': '⛏️', 'Лопаты': '🪣', 'Копья': '🔱', 'Щиты': '️',
-				'Тотемы': '🗿', 'Огнестрельное оружие': '🔫', 'Стрелы': '🏹',
-				'Шалкера': '📦', 'Декор': '🎨', 'Стойки для брони': '👤',
-				'Еда': '🍔', 'Зелья': '🧪', 'Книги': '', 'Игры': '🎲', 'Прочее': '📌'
-			};
-			
-			// Левая панель - Содержание (автоматически из categories)
+			// Левая панель - Содержание (с эмодзи из объекта категории)
 			let leftHTML = '';
-			categories.forEach(cat => {
-				const count = allModels.filter(m => m.category === cat).length;
+			categories.forEach(catObj => {
+				const catName = catObj.name;
+				const catEmoji = catObj.emoji || '📄';
+				const count = allModels.filter(m => m.category === catName).length;
 				if (count > 0) {
-					const id = cat.toLowerCase().replace(/\s+/g, '-');
-					const emoji = emojis[cat] || '📄';
-					leftHTML += `<li><a href="#${id}">${emoji} ${cat}</a></li>`;
+					const id = catName.toLowerCase().replace(/\s+/g, '-');
+					leftHTML += `<li><a href="#${id}">${catEmoji} ${catName}</a></li>`;
 				}
 			});
 			sidebarContent.innerHTML = leftHTML;
 
-			// Правая панель - Ссылки (из links)
+			// Правая панель - Ссылки
 			let rightHTML = '';
 			if (links && links.length > 0) {
 				links.forEach(link => {
@@ -204,15 +200,10 @@
 					rightHTML += `<li><a href="${link.url}"${target}>${icon} ${link.title}</a></li>`;
 				});
 			} else {
-				rightHTML = `
-					<li><a href="#аксессуары">️ Наверх</a></li>
-					<li><a href="https://github.com/MaximLapkin/SleepCraftResourcepack" target="_blank">📥 GitHub</a></li>
-					<li><a href="admin-panel.html"> Админка</a></li>
-				`;
+				rightHTML = `<li><a href="#аксессуары">⬆️ Наверх</a></li>`;
 			}
 			navContent.innerHTML = rightHTML;
 		}
-
 		// === ПРОВЕРКА АДМИНА ===
 		const urlParams = new URLSearchParams(window.location.search);
 		if (urlParams.get('logout') === 'true') {

@@ -27,9 +27,12 @@
         .category-block:hover { background: #2f2f2f; }
         .category-block.dragging { opacity: 0.5; }
         .category-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px; }
-        .category-header h2 { color: #58a6ff; margin: 0; flex: 1; }
+        .category-header h2 { color: #58a6ff; margin: 0; flex: 1; font-size: 1.3rem; }
+        .cat-emoji { font-size: 1.5rem; }
         .drag-handle-cat { font-size: 1.5rem; color: #666; cursor: grab; user-select: none; padding: 5px; }
         .drag-handle-cat:hover { color: #58a6ff; }
+        .btn-edit-cat { background: transparent; border: 1px solid #58a6ff; color: #58a6ff; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 1rem; }
+        .btn-edit-cat:hover { background: #58a6ff; color: white; }
         .model-item { background: #1a1a1a; padding: 12px 15px; margin: 8px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: grab; transition: background 0.2s; }
         .model-item:hover { background: #252525; }
         .model-item.dragging { opacity: 0.5; background: #333; }
@@ -64,7 +67,7 @@
 <body>
     <div class="container">
         <div class="login-box" id="loginBox">
-            <h2> Вход в админ-панель</h2>
+            <h2>🔐 Вход в админ-панель</h2>
             <input type="text" id="username" placeholder="Логин">
             <input type="password" id="password" placeholder="Пароль">
             <button onclick="login()">Войти</button>
@@ -76,15 +79,15 @@
             <div class="toolbar">
                 <button class="btn btn-add" onclick="openAddModal()">➕ Добавить модель</button>
                 <button class="btn btn-add-cat" onclick="openAddCategoryModal()">📁 Добавить категорию</button>
-                <button class="btn btn-add-link" onclick="openAddLinkModal()"> Добавить ссылку</button>
-                <button class="btn btn-download" onclick="downloadModels()"> Скачать models.json</button>
-                <button class="btn btn-logout" onclick="logout()"> Выйти</button>
+                <button class="btn btn-add-link" onclick="openAddLinkModal()">🔗 Добавить ссылку</button>
+                <button class="btn btn-download" onclick="downloadModels()">📥 Скачать models.json</button>
+                <button class="btn btn-logout" onclick="logout()">🚪 Выйти</button>
             </div>
 
             <h2 class="section-title">📂 Категории и модели</h2>
             <div id="categoriesList"></div>
 
-            <h2 class="section-title"> Ссылки (правая панель)</h2>
+            <h2 class="section-title">🔗 Ссылки (правая панель)</h2>
             <div id="linksList"></div>
         </div>
     </div>
@@ -113,11 +116,13 @@
     <!-- Модалка категории -->
     <div class="modal" id="categoryModal">
         <div class="modal-content">
-            <h3>📁 Добавить новую категорию</h3>
+            <h3 id="catModalTitle">📁 Добавить новую категорию</h3>
+            <label>Эмодзи:</label>
+            <input type="text" id="newCategoryEmoji" placeholder="📄" maxlength="4">
             <label>Название категории:</label>
             <input type="text" id="newCategoryName" placeholder="Например: Броня">
             <div class="modal-actions">
-                <button class="btn btn-save" onclick="addCategory()">💾 Добавить</button>
+                <button class="btn btn-save" onclick="saveCategory()">💾 Сохранить</button>
                 <button class="btn btn-cancel" onclick="closeCategoryModal()">Отмена</button>
             </div>
         </div>
@@ -143,16 +148,16 @@
     <script src="users.js"></script>
     <script>
         let models = [];
-        let categories = [];
+        let categories = []; // Теперь это массив объектов {name, emoji}
         let links = [];
         let editingIndex = -1;
         let editingLinkIndex = -1;
+        let editingCatIndex = -1;
 
         async function login() {
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
             const errorMsg = document.getElementById('errorMsg');
-
             const msgUint8 = new TextEncoder().encode(password + "SCRP_Salt_2024_Secret_Key_!@#");
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
             const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -185,35 +190,42 @@
                 const response = await fetch('models.json');
                 const data = await response.json();
                 models = data.models || [];
-                categories = data.categories || [];
+                // Миграция: если категории - это просто строки, превращаем их в объекты
+                if (data.categories && data.categories.length > 0) {
+                    if (typeof data.categories[0] === 'string') {
+                        categories = data.categories.map(c => ({ name: c, emoji: '📄' }));
+                    } else {
+                        categories = data.categories;
+                    }
+                } else {
+                    categories = [];
+                }
                 links = data.links || [];
                 renderModels();
                 renderLinks();
             } catch (error) {
                 console.error('Ошибка загрузки:', error);
-                models = [];
-                categories = [];
-                links = [];
-                renderModels();
-                renderLinks();
+                models = []; categories = []; links = [];
+                renderModels(); renderLinks();
             }
         }
 
         function renderModels() {
             const list = document.getElementById('categoriesList');
             list.innerHTML = '';
-
             if (categories.length === 0) {
                 list.innerHTML = '<p style="color: #888;">Нет категорий. Добавьте первую!</p>';
                 return;
             }
 
-            categories.forEach(category => {
-                const modelsInCat = models.filter(m => m.category === category);
+            categories.forEach((catObj, catIndex) => {
+                const catName = catObj.name;
+                const catEmoji = catObj.emoji || '📄';
+                const modelsInCat = models.filter(m => m.category === catName);
                 
                 const block = document.createElement('div');
                 block.className = 'category-block';
-                block.dataset.category = category;
+                block.dataset.catIndex = catIndex;
                 
                 const modelsContainer = document.createElement('div');
                 modelsContainer.className = 'models-container';
@@ -222,7 +234,7 @@
                     const realIndex = models.indexOf(model);
                     return `
                         <div class="model-item" data-index="${realIndex}">
-                            <span class="drag-handle" title="Перетащи">⋮</span>
+                            <span class="drag-handle" title="Перетащи">⋮⋮</span>
                             <div class="model-info">
                                 <img src="${model.icon}" alt="" onerror="this.style.display='none'">
                                 <div class="model-details">
@@ -232,7 +244,7 @@
                             </div>
                             <div class="model-actions">
                                 <button class="btn btn-edit" onclick="editModel(${realIndex})">✏️</button>
-                                <button class="btn btn-delete" onclick="deleteModel(${realIndex})">️</button>
+                                <button class="btn btn-delete" onclick="deleteModel(${realIndex})">🗑️</button>
                             </div>
                         </div>
                     `;
@@ -246,7 +258,9 @@
                 block.innerHTML = `
                     <div class="category-header">
                         <span class="drag-handle-cat" title="Перетащи категорию">⋮⋮</span>
-                        <h2>${category} (${modelsInCat.length})</h2>
+                        <span class="cat-emoji">${catEmoji}</span>
+                        <h2>${catName} (${modelsInCat.length})</h2>
+                        <button class="btn-edit-cat" onclick="editCategory(${catIndex})" title="Редактировать категорию">✏️</button>
                     </div>
                 `;
                 block.appendChild(modelsContainer);
@@ -254,14 +268,12 @@
 
                 if (modelsInCat.length > 0) {
                     new Sortable(modelsContainer, {
-                        handle: '.drag-handle',
-                        animation: 150,
-                        ghostClass: 'dragging',
+                        handle: '.drag-handle', animation: 150, ghostClass: 'dragging',
                         onEnd: function(evt) {
                             const oldIndex = parseInt(evt.item.dataset.index);
                             const newIndex = evt.newIndex;
                             const movedModel = models.splice(oldIndex, 1)[0];
-                            const categoryModels = models.filter(m => m.category === category);
+                            const categoryModels = models.filter(m => m.category === catName);
                             const categoryStartIndex = models.indexOf(categoryModels[0]);
                             models.splice(categoryStartIndex + newIndex, 0, movedModel);
                             renderModels();
@@ -271,12 +283,10 @@
             });
 
             new Sortable(list, {
-                handle: '.drag-handle-cat',
-                animation: 150,
-                ghostClass: 'dragging',
+                handle: '.drag-handle-cat', animation: 150, ghostClass: 'dragging',
                 onEnd: function(evt) {
-                    const movedCategory = categories.splice(evt.oldIndex, 1)[0];
-                    categories.splice(evt.newIndex, 0, movedCategory);
+                    const movedCat = categories.splice(evt.oldIndex, 1)[0];
+                    categories.splice(evt.newIndex, 0, movedCat);
                     renderModels();
                 }
             });
@@ -285,15 +295,12 @@
         function renderLinks() {
             const list = document.getElementById('linksList');
             list.innerHTML = '';
-
             if (links.length === 0) {
                 list.innerHTML = '<p style="color: #888;">Нет ссылок. Добавьте первую!</p>';
                 return;
             }
-
             const linksContainer = document.createElement('div');
             linksContainer.className = 'links-container';
-
             linksContainer.innerHTML = links.map((link, idx) => `
                 <div class="link-item" data-index="${idx}">
                     <span class="drag-handle" title="Перетащи">⋮⋮</span>
@@ -310,13 +317,9 @@
                     </div>
                 </div>
             `).join('');
-
             list.appendChild(linksContainer);
-
             new Sortable(linksContainer, {
-                handle: '.drag-handle',
-                animation: 150,
-                ghostClass: 'dragging',
+                handle: '.drag-handle', animation: 150, ghostClass: 'dragging',
                 onEnd: function(evt) {
                     const movedLink = links.splice(evt.oldIndex, 1)[0];
                     links.splice(evt.newIndex, 0, movedLink);
@@ -327,14 +330,14 @@
 
         function populateCategorySelect() {
             const select = document.getElementById('category');
-            select.innerHTML = categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+            select.innerHTML = categories.map(cat => `<option value="${cat.name}">${cat.name}</option>`).join('');
         }
 
         function openAddModal() {
             editingIndex = -1;
             document.getElementById('modalTitle').textContent = 'Добавить модель';
             populateCategorySelect();
-            document.getElementById('category').value = categories[0] || '';
+            document.getElementById('category').value = categories[0]?.name || '';
             document.getElementById('icon').value = '';
             document.getElementById('name').value = '';
             document.getElementById('item').value = '';
@@ -355,9 +358,7 @@
             document.getElementById('modal').classList.add('active');
         }
 
-        function closeModal() {
-            document.getElementById('modal').classList.remove('active');
-        }
+        function closeModal() { document.getElementById('modal').classList.remove('active'); }
 
         function saveModel() {
             const model = {
@@ -367,49 +368,57 @@
                 item: document.getElementById('item').value,
                 feature: document.getElementById('feature').value
             };
-
-            if (!model.name || !model.category) {
-                alert('Заполните название и выберите категорию!');
-                return;
-            }
-
-            if (editingIndex === -1) {
-                models.push(model);
-            } else {
-                models[editingIndex] = model;
-            }
-
-            closeModal();
-            renderModels();
+            if (!model.name || !model.category) { alert('Заполните название и выберите категорию!'); return; }
+            if (editingIndex === -1) models.push(model);
+            else models[editingIndex] = model;
+            closeModal(); renderModels();
         }
 
         function deleteModel(index) {
             if (confirm('Удалить модель "' + models[index].name + '"?')) {
-                models.splice(index, 1);
-                renderModels();
+                models.splice(index, 1); renderModels();
             }
         }
 
+        // === КАТЕГОРИИ ===
         function openAddCategoryModal() {
+            editingCatIndex = -1;
+            document.getElementById('catModalTitle').textContent = '📁 Добавить новую категорию';
+            document.getElementById('newCategoryEmoji').value = '📄';
             document.getElementById('newCategoryName').value = '';
             document.getElementById('categoryModal').classList.add('active');
         }
 
-        function closeCategoryModal() {
-            document.getElementById('categoryModal').classList.remove('active');
+        function editCategory(index) {
+            editingCatIndex = index;
+            const cat = categories[index];
+            document.getElementById('catModalTitle').textContent = '✏️ Редактировать категорию';
+            document.getElementById('newCategoryEmoji').value = cat.emoji || '📄';
+            document.getElementById('newCategoryName').value = cat.name;
+            document.getElementById('categoryModal').classList.add('active');
         }
 
-        function addCategory() {
+        function closeCategoryModal() { document.getElementById('categoryModal').classList.remove('active'); }
+
+        function saveCategory() {
             const name = document.getElementById('newCategoryName').value.trim();
-            if (!name) {
-                alert('Введите название категории!');
-                return;
+            const emoji = document.getElementById('newCategoryEmoji').value.trim() || '📄';
+            if (!name) { alert('Введите название категории!'); return; }
+            
+            // Проверка на дубликат имени (кроме текущей редактируемой)
+            const exists = categories.some((c, idx) => c.name === name && idx !== editingCatIndex);
+            if (exists) { alert('Категория с таким названием уже существует!'); return; }
+
+            if (editingCatIndex === -1) {
+                categories.push({ name: name, emoji: emoji });
+            } else {
+                const oldName = categories[editingCatIndex].name;
+                categories[editingCatIndex] = { name: name, emoji: emoji };
+                // Обновляем категорию у всех моделей, которые принадлежали старой категории
+                models.forEach(m => {
+                    if (m.category === oldName) m.category = name;
+                });
             }
-            if (categories.includes(name)) {
-                alert('Такая категория уже существует!');
-                return;
-            }
-            categories.push(name);
             closeCategoryModal();
             renderModels();
         }
@@ -434,9 +443,7 @@
             document.getElementById('linkModal').classList.add('active');
         }
 
-        function closeLinkModal() {
-            document.getElementById('linkModal').classList.remove('active');
-        }
+        function closeLinkModal() { document.getElementById('linkModal').classList.remove('active'); }
 
         function saveLink() {
             const link = {
@@ -444,48 +451,29 @@
                 title: document.getElementById('linkTitle').value,
                 url: document.getElementById('linkUrl').value
             };
-
-            if (!link.title || !link.url) {
-                alert('Заполните название и URL!');
-                return;
-            }
-
-            if (editingLinkIndex === -1) {
-                links.push(link);
-            } else {
-                links[editingLinkIndex] = link;
-            }
-
-            closeLinkModal();
-            renderLinks();
+            if (!link.title || !link.url) { alert('Заполните название и URL!'); return; }
+            if (editingLinkIndex === -1) links.push(link);
+            else links[editingLinkIndex] = link;
+            closeLinkModal(); renderLinks();
         }
 
         function deleteLink(index) {
             if (confirm('Удалить ссылку "' + links[index].title + '"?')) {
-                links.splice(index, 1);
-                renderLinks();
+                links.splice(index, 1); renderLinks();
             }
         }
 
         function downloadModels() {
-            const data = {
-                categories: categories,
-                models: models,
-                links: links
-            };
+            const data = { categories: categories, models: models, links: links };
             const jsonStr = JSON.stringify(data, null, 2);
             const blob = new Blob([jsonStr], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
-            a.download = 'models.json';
-            a.click();
+            a.href = url; a.download = 'models.json'; a.click();
             URL.revokeObjectURL(url);
         }
 
-        if (localStorage.getItem('adminLoggedIn') === 'true') {
-            showAdminPanel();
-        }
+        if (localStorage.getItem('adminLoggedIn') === 'true') showAdminPanel();
     </script>
 </body>
 </html>
