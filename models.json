@@ -1119,6 +1119,11 @@
       "url": "index.html"
     },
     {
+      "icon": "👑",
+      "title": "Создатели",
+      "url": "creators.html"
+    },
+    {
       "icon": "🗨️",
       "title": "Телеграм канал",
       "url": "https://t.me/SCRPNews"
